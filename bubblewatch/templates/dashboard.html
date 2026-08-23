@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BubbleWatch · AI-cycle monitor</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0b0e14;--card:#121722;--line:#1f2937;--fg:#dbe4f0;--dim:#6b7a90;--up:#34d399;--acc:#f59e0b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;padding:24px}
+.wrap{max-width:1080px;margin:0 auto}
+h1{font-size:18px;letter-spacing:.08em;margin-bottom:2px}
+.dim{color:var(--dim)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-top:16px}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:16px}
+.nav{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:18px;padding:12px 16px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:13px}
+.nav a{color:var(--fg);text-decoration:none}.nav a:hover{color:var(--acc)}.nav .here{color:var(--acc)}
+.big-temp{font-size:52px;font-weight:700;line-height:1.1}
+.bar{height:10px;background:#1a2233;border-radius:999px;margin-top:12px;overflow:hidden;border:1px solid var(--line)}
+.bar>div{height:100%;background:linear-gradient(90deg,#38bdf8,#34d399,#fbbf24,#f87171)}
+.chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid var(--line);font-size:12px;background:#182236}
+.chip.hot{color:#f87171}.chip.cold{color:#60a5fa}.chip.ok{color:var(--up)}
+.kv{font-size:13px;color:var(--dim)}.kv b{color:var(--fg);font-size:20px;display:block;margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--dim);font-weight:400;text-transform:uppercase;font-size:10px;letter-spacing:.08em}
+.alert{border-left:3px solid #f87171;background:#1c1216;padding:8px 12px;margin-top:8px;border-radius:0 8px 8px 0;font-size:12.5px}
+footer{margin-top:26px;color:var(--dim);font-size:11px;line-height:1.7}
+.chartwrap{position:relative;height:260px}
+h2{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="nav">
+  <a class="here" href="index.html">dashboard</a>
+  <a href="about.html">what is this?</a>
+  <a href="guide.html">reading the numbers</a>
+  <a href="method.html">under the hood</a>
+</nav>
+
+<h1>BUBBLEWATCH <span class="dim">// ai-cycle monitor</span></h1>
+<p class="dim" id="updated">loading…</p>
+
+<div class="card">
+  <h2>Bubble temperature</h2>
+  <div><span class="big-temp" id="temp">–</span><span class="dim" style="font-size:20px">/100</span>
+       <span class="chip" id="band" style="margin-left:14px">…</span></div>
+  <div class="bar"><div id="tempbar" style="width:0%"></div></div>
+  <p class="dim" style="margin-top:8px" id="tempnote"></p>
+</div>
+
+<div class="grid">
+  <div class="card"><div class="kv">Regime<b><span class="chip" id="regime">…</span></b><span class="dim" id="regimeWhy" style="font-size:12px;display:block;margin-top:6px"></span></div></div>
+  <div class="card"><div class="kv">P(AI complex up, next 5d)<b id="pup">–</b><span class="dim" id="modelmeta" style="font-size:11.5px"></span></div></div>
+  <div class="card"><div class="kv">HY credit spread (OAS)<b id="oas">–</b><span class="dim" id="oaschg" style="font-size:12px"></span></div></div>
+  <div class="card"><div class="kv">Fundamentals anchor<b id="nvda">–</b><span class="dim" id="capexline" style="font-size:12px"></span></div></div>
+</div>
+
+<div id="alerts"></div>
+
+<div class="grid">
+  <div class="card"><h2>AI complex vs SPY vs equal-weight S&P (rebased 100)</h2><div class="chartwrap"><canvas id="c_rebase"></canvas></div></div>
+  <div class="card"><h2>Bubble temperature history</h2><div class="chartwrap"><canvas id="c_temp"></canvas></div></div>
+  <div class="card"><h2>US high-yield credit spreads (%)</h2><div class="chartwrap"><canvas id="c_oas"></canvas></div></div>
+  <div class="card"><h2>AI complex vs power/utilities theme (rebased 100)</h2><div class="chartwrap"><canvas id="c_theme"></canvas></div></div>
+</div>
+
+<div class="card">
+  <h2>Indicators</h2>
+  <table><thead><tr><th>indicator</th><th>value</th></tr></thead><tbody id="indrows"></tbody></table>
+</div>
+
+<div class="card" id="fundcard">
+  <h2>Fundamentals anchor — hyperscaler capex ($B) &amp; NVDA revenue YoY (%)</h2>
+  <table><thead><tr><th>quarter</th><th>capex $B</th><th>NVDA YoY %</th></tr></thead><tbody id="fundrows"></tbody></table>
+  <p class="dim" style="font-size:11.5px;margin-top:8px">Seeded through 2025Q2 from earnings releases — append new rows in data/manual/hyperscaler_capex.csv each quarter.</p>
+</div>
+
+<div class="card" id="scorecard">
+  <h2>Prediction scoreboard</h2>
+  <table><thead><tr><th>target</th><th>forecaster</th><th>n</th><th>brier ↓</th><th>accuracy</th></tr></thead><tbody id="scorerows"></tbody></table>
+  <p class="dim" style="font-size:11.5px;margin-top:8px">Constant 0.50 is the permanent baseline — if the model row can't beat it out-of-sample, it says so here.</p>
+</div>
+
+<footer>BubbleWatch v0 · data: Yahoo/Stooq quotes, FRED credit series, manually seeded capex · temperature = published weighted z-composite, not investment advice · <a href="https://github.com/TanishkBansode/bubblewatch" style="color:var(--acc)">source</a> · companion site: glutclock</footer>
+</div>
+
+<script>
+const D = __BUBBLEWATCH_PAYLOAD__;
+const S = D.snap || {};
+
+function fmt(v, d=2){ return (v===null||v===undefined) ? "–" : Number(v).toFixed(d); }
+function pct(v){ return (v===null||v===undefined) ? "–" : (Number(v)*100).toFixed(1)+"%"; }
+
+document.getElementById("updated").textContent = "updated "+D.generated+" UTC · model "+D.modelVersion;
+
+const temp = S.temperature;
+document.getElementById("temp").textContent = temp==null ? "–" : Math.round(temp);
+const band = S.temperature_band || "unknown";
+const bandEl = document.getElementById("band");
+bandEl.textContent = band;
+if(band==="frost") bandEl.className="chip cold";
+else if(band==="hot"||band==="euphoric") bandEl.className="chip hot";
+else bandEl.className="chip ok";
+document.getElementById("tempbar").style.width = (temp==null?0:Math.max(temp,2))+"%";
+document.getElementById("tempnote").textContent =
+  "weighted composite of six z-scored gauges (momentum stretch, crowding, concentration, credit complacency, proximity-to-highs, risk appetite) — formula on the guide page."+
+  (S.temp_confidence!=null ? " gauge coverage "+Math.round(S.temp_confidence*100)+"%." : "");
+
+const regimeEl = document.getElementById("regime");
+regimeEl.textContent = D.regime.label;
+if(["contraction","distribution"].includes(D.regime.label)) regimeEl.className="chip hot";
+else if(["expansion","euphoria"].includes(D.regime.label)) regimeEl.className="chip ok";
+else if(D.regime.label==="capitulation_recovery") regimeEl.className="chip cold";
+document.getElementById("regimeWhy").textContent = D.regime.reason;
+
+if(D.proxy && D.proxy.status==="ok"){
+  document.getElementById("pup").textContent = Math.round(D.proxy.p_ai_up_5d*100)+"%";
+  let m = "test brier "+D.proxy.brier+" · majority acc "+D.proxy.majority_baseline_acc;
+  if(D.proxy.accuracy!=null) m += " · model acc "+D.proxy.accuracy;
+  document.getElementById("modelmeta").textContent = m + " · trained to "+D.proxy.asof;
+}else{
+  document.getElementById("pup").textContent = "warming up";
+  document.getElementById("modelmeta").textContent = D.proxy ? D.proxy.status : "";
+}
+
+document.getElementById("oas").textContent = fmt(S.hy_oas,2)+"%";
+document.getElementById("oaschg").textContent = S.hy_oas_chg_5d!=null ? ("5d change "+(S.hy_oas_chg_5d>=0?"+":"")+(S.hy_oas_chg_5d*100).toFixed(0)+"bp") : "";
+
+if(S.nvda_rev_yoy_pct!=null){
+  document.getElementById("nvda").textContent = "+"+S.nvda_rev_yoy_pct+"% YoY";
+  let c=[];
+  if(S.capex_usd_b!=null) c.push("hyperscaler capex $"+S.capex_usd_b+"B");
+  if(S.capex_yoy_pct!=null) c.push("capex YoY +"+S.capex_yoy_pct+"%");
+  if(S.capex_age_days!=null) c.push("as of "+S.capex_age_days+"d ago");
+  document.getElementById("capexline").textContent = c.join(" · ");
+}else{
+  document.getElementById("nvda").textContent = "seed pending";
+  document.getElementById("capexline").textContent = "append quarterly rows to hyperscaler_capex.csv";
+}
+
+const alertBox = document.getElementById("alerts");
+(D.alerts||[]).forEach(a=>{ const d=document.createElement("div"); d.className="alert"; d.textContent="⚠ "+a; alertBox.appendChild(d); });
+
+const tb = document.getElementById("indrows");
+(D.indicators||[]).forEach(r=>{
+  const tr=document.createElement("tr");
+  const v = typeof r.value==="number" ? r.value.toLocaleString(undefined,{maximumFractionDigits:2}) : r.value;
+  tr.innerHTML="<td>"+r.label+"</td><td>"+v+"</td>"; tb.appendChild(tr);
+});
+
+const fb = document.getElementById("fundrows");
+const F = D.fundamentals||{};
+(F.periods||[]).forEach((p,i)=>{
+  const tr=document.createElement("tr");
+  tr.innerHTML="<td>"+p+"</td><td>"+fmt(F.capex[i],1)+"</td><td>"+fmt(F.nvda_yoy[i],0)+"</td>";
+  fb.prepend(tr);
+});
+if(!(F.periods||[]).length) document.getElementById("fundcard").style.display="none";
+
+const sb=document.getElementById("scorerows");
+let scored=false;
+(D.scoreboard||[]).forEach(r=>{ scored=true;
+  const tr=document.createElement("tr");
+  tr.innerHTML="<td>"+r.target+"</td><td>"+r.model+"</td><td>"+r.n+"</td><td>"+r.brier+"</td><td>"+r.accuracy+"</td>";
+  sb.appendChild(tr);
+});
+if(!scored) sb.innerHTML='<tr><td colspan="5" class="dim">no predictions old enough to score yet — first scores appear once horizons elapse</td></tr>';
+
+Chart.defaults.color="#6b7a90"; Chart.defaults.borderColor="#1f2937"; Chart.defaults.font.family="ui-monospace,Menlo,monospace"; Chart.defaults.font.size=10;
+function line(id, labels, datasets, yOpts={}){
+  const el=document.getElementById(id); if(!el) return;
+  new Chart(el,{type:"line",data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,animation:false,
+      interaction:{mode:"index",intersect:false},
+      plugins:{legend:{labels:{boxWidth:10}}},
+      scales:{x:{ticks:{maxTicksLimit:7}},y:{...yOpts}}}});
+}
+const R=D.charts.rebase||{};
+if(R.dates) line("c_rebase",R.dates,[
+  {label:"AI complex",data:R.ai,borderColor:"#f59e0b",pointRadius:0,borderWidth:1.5,tension:.15},
+  {label:"SPY",data:R.spx,borderColor:"#60a5fa",pointRadius:0,borderWidth:1,tension:.15},
+  {label:"equal-weight (RSP)",data:R.eqw,borderColor:"#6b7a90",pointRadius:0,borderWidth:1,borderDash:[4,3],tension:.15}]);
+const T=D.charts.temp||{};
+if(T.dates) line("c_temp",T.dates,[{label:"temperature",data:T.values,borderColor:"#f87171",backgroundColor:"rgba(248,113,113,.08)",fill:true,pointRadius:0,borderWidth:1.5,tension:.2}],{suggestedMin:0,suggestedMax:100});
+const O=D.charts.oas||{};
+if(O.dates) line("c_oas",O.dates,[{label:"HY OAS %",data:O.values,borderColor:"#38bdf8",pointRadius:0,borderWidth:1.5,tension:.15}]);
+const TH=D.charts.theme||{};
+if(TH.dates) line("c_theme",TH.dates,[
+  {label:"AI complex",data:TH.ai,borderColor:"#f59e0b",pointRadius:0,borderWidth:1.5,tension:.15},
+  {label:"power/utilities",data:TH.power,borderColor:"#34d399",pointRadius:0,borderWidth:1,tension:.15}]);
+</script>
+</body>
+</html>

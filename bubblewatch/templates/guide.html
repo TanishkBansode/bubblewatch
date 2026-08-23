@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BubbleWatch · reading the numbers</title>
+<style>
+:root{--bg:#0b0e14;--card:#121722;--line:#1f2937;--fg:#dbe4f0;--dim:#6b7a90;--acc:#f59e0b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font:14px/1.6 ui-monospace,Menlo,Consolas,monospace;padding:24px;max-width:1000px;margin:0 auto}
+h1{font-size:18px;letter-spacing:.08em;margin-bottom:2px}
+h2{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.12em;margin:26px 0 10px}
+p{margin:8px 0;max-width:78ch}
+ul{margin:8px 0 8px 20px;max-width:78ch}li{margin:5px 0}
+a{color:var(--acc);text-decoration:none}
+code{background:#0f1420;border:1px solid var(--line);padding:1px 5px;border-radius:4px;font-size:12px;color:#93c5fd}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin:10px 0}
+td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--dim);font-weight:400;text-transform:uppercase;font-size:10px;letter-spacing:.08em}
+.dim{color:var(--dim)}
+.note{border-left:3px solid var(--acc);background:#181207;padding:10px 14px;margin:14px 0;border-radius:0 8px 8px 0;max-width:78ch}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-top:16px}
+.nav{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:20px;padding:12px 16px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:13px}
+.nav a{color:var(--fg)}.nav a:hover{color:var(--acc)}.nav .here{color:var(--acc)}
+footer{margin-top:26px;color:var(--dim);font-size:11px;line-height:1.6}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="index.html">dashboard</a>
+  <a href="about.html">what is this?</a>
+  <a class="here" href="guide.html">reading the numbers</a>
+  <a href="method.html">under the hood</a>
+</nav>
+
+<h1>READING THE NUMBERS</h1>
+<p class="dim">Every element of the dashboard, what it means, and how to act on it.</p>
+
+<div class="card">
+<h2>1 · Bubble temperature (the headline gauge)</h2>
+<p>A single number from 0 (ice) to 100 (blow-off). It is a weighted average of six z-scores — each
+gauge measures how unusual <i>today's</i> reading is versus the last ~250 trading days of itself:</p>
+<table>
+<tr><th>gauge</th><th>weight</th><th>measures</th></tr>
+<tr><td><code>z_mom_stretch</code></td><td>20%</td><td>60-day return of the AI complex vs its own history — how stretched the move is</td></tr>
+<tr><td><code>z_credit_tightness</code></td><td>20%</td><td>US high-yield spreads vs their history — abnormally TIGHT credit = nobody demands compensation for risk = classic late-cycle tell</td></tr>
+<tr><td><code>z_dd_proximity</code></td><td>20%</td><td>how close prices sit to their 250-day high — near highs = fragile euphoria zone</td></tr>
+<tr><td><code>z_rs_eqw</code></td><td>15%</td><td>AI complex outperformance vs equal-weight S&amp;P — money crowding into one theme</td></tr>
+<tr><td><code>z_concentration</code></td><td>15%</td><td>cap-weighted vs equal-weight spread — index concentration building (price-based proxy; see method page)</td></tr>
+<tr><td><code>z_btc_risk</code></td><td>10%</td><td>BTC 30d momentum as a generic risk-appetite thermometer</td></tr>
+</table>
+<p>Each z is clipped at ±2 and mapped so an average z of +2 → temperature 100, −2 → 0:</p>
+<p><code>T = clip(50 + 25 × Σ(wᵢ·zᵢ) / Σ(wᵢ present), 0, 100)</code></p>
+<p class="dim">If some gauges are missing (cold start), weights renormalize and "gauge coverage" shows how much backs the number.</p>
+<table>
+<tr><th>band</th><th>range</th><th>read it as</th></tr>
+<tr><td>frost</td><td>&lt;25</td><td>extreme pessimism; historically where reversals get interesting</td></tr>
+<tr><td>cool</td><td>25–45</td><td>skepticism priced in</td></tr>
+<tr><td>warm</td><td>45–60</td><td>normal market</td></tr>
+<tr><td>hot</td><td>60–75</td><td>elevated froth</td></tr>
+<tr><td>euphoric</td><td>≥75</td><td>melt-up territory; risk/reward typically worst right here</td></tr>
+</table>
+<div class="note">Hot ≠ imminent crash. Bubbles stay hot far longer than skeptics expect. Temperature
+tells you where you are in the arc, not when it ends.</div>
+</div>
+
+<div class="card">
+<h2>2 · Regime chip</h2>
+<table>
+<tr><th>state</th><th>trigger (roughly)</th><th>meaning</th></tr>
+<tr><td><code>expansion</code></td><td>60d trend up, no froth extremes</td><td>trend healthy</td></tr>
+<tr><td><code>euphoria</code></td><td>temperature ≥70 with intact trend</td><td>late-stage melt-up conditions</td></tr>
+<tr><td><code>distribution</code></td><td>20d momentum negative above deep-bear zone</td><td>smart-money selling into strength; earliest actionable warning</td></tr>
+<tr><td><code>contraction</code></td><td>&gt;25% drawdown</td><td>break underway</td></tr>
+<tr><td><code>capitulation_recovery</code></td><td>&gt;30% drawdown + momentum turning up</td><td>historically the zone where durable bottoms form</td></tr>
+<tr><td><code>neutral/unknown</code></td><td>mixed or cold start</td><td>no verdict</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>3 · Direction model card</h2>
+<p><code>P(AI complex up next 5d)</code> — logistic regression on momentum, relative-strength,
+credit-change and volatility features, trained chronologically (80% train / 20% test). Unlike
+GlutClock's physical-price models, this trains immediately on two years of backfilled quotes.</p>
+<ul>
+  <li><b>Brier score</b>: mean squared error of probability forecasts on yes/no outcomes. Guessing 50%
+  forever scores ~0.25 on balanced events; lower is better.</li>
+  <li><b>majority baseline acc</b>: accuracy of always guessing the more common outcome. If the model
+  barely beats it, the dashboard admits it.</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>4 · The charts</h2>
+<table>
+<tr><th>chart</th><th>read it as</th></tr>
+<tr><td>AI complex vs SPY vs equal-weight</td><td>gap between amber and dashed grey = theme crowding; gap collapsing = rotation out beginning</td></tr>
+<tr><td>Temperature history</td><td>the arc itself — watch for divergence: price highs while temperature rolls over = exhaustion</td></tr>
+<tr><td>HY credit spreads</td><td>rising line during equity calm = stress migrating in from credit first (often leads)</td></tr>
+<tr><td>AI complex vs power/utilities</td><td>the buildout trade's second derivative: power names lagging AI names = market doubting the physical buildout</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>5 · Fundamentals anchor</h2>
+<p>Hyperscaler capex ($B/quarter) and NVDA revenue YoY are the real cash flows underneath the story.
+Rules of thumb:</p>
+<ul>
+  <li>NVDA YoY decelerating ≥15pts QoQ triggers an alert — growth deceleration at high valuations is the classic pre-break setup.</li>
+  <li>Capex still rising + temperature falling = market pricing trouble before companies report it.</li>
+  <li>The anchor updates only when new rows land in <code>data/manual/hyperscaler_capex.csv</code> — staleness is surfaced in days.</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>6 · Prediction scoreboard</h2>
+<p>Every run logs P(up) to an append-only ledger keyed by feature-hash. When horizons elapse,
+outcomes join back and both model and constant-0.50 baseline get scored by Brier and accuracy.
+Calibration beats confidence: a "70%" forecast should come true about 70% of the time.</p>
+</div>
+
+<footer>BubbleWatch · not investment advice · tiny-sample probabilities will be wrong sometimes — that's why they're scored publicly.</footer>
+</body>
+</html>

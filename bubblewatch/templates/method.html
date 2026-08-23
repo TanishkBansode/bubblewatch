@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BubbleWatch · under the hood</title>
+<style>
+:root{--bg:#0b0e14;--card:#121722;--line:#1f2937;--fg:#dbe4f0;--dim:#6b7a90;--acc:#f59e0b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font:14px/1.6 ui-monospace,Menlo,Consolas,monospace;padding:24px;max-width:1000px;margin:0 auto}
+h1{font-size:18px;letter-spacing:.08em;margin-bottom:2px}
+h2{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.12em;margin:26px 0 10px}
+p{margin:8px 0;max-width:78ch}
+ul{margin:8px 0 8px 20px;max-width:78ch}li{margin:5px 0}
+a{color:var(--acc);text-decoration:none}
+code{background:#0f1420;border:1px solid var(--line);padding:1px 5px;border-radius:4px;font-size:12px;color:#93c5fd}
+pre{background:#0f1420;border:1px solid var(--line);border-radius:8px;padding:12px;overflow-x:auto;font-size:11.5px;margin:10px 0;max-width:84ch;line-height:1.45}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin:10px 0}
+td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--dim);font-weight:400;text-transform:uppercase;font-size:10px;letter-spacing:.08em}
+.dim{color:var(--dim)}
+.note{border-left:3px solid var(--acc);background:#181207;padding:10px 14px;margin:14px 0;border-radius:0 8px 8px 0;max-width:78ch}
+.warn{border-left-color:#f87171;background:#1c1216}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-top:16px}
+.nav{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:20px;padding:12px 16px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:13px}
+.nav a{color:var(--fg)}.nav a:hover{color:var(--acc)}.nav .here{color:var(--acc)}
+footer{margin-top:26px;color:var(--dim);font-size:11px;line-height:1.6}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="index.html">dashboard</a>
+  <a href="about.html">what is this?</a>
+  <a href="guide.html">reading the numbers</a>
+  <a class="here" href="method.html">under the hood</a>
+</nav>
+
+<h1>UNDER THE HOOD</h1>
+<p class="dim">Sources, pipeline, models, validation rules, and the honest limitations.</p>
+
+<div class="card">
+<h2>Pipeline (daily on GitHub Actions)</h2>
+<pre>ingest ──► parquet lake (git) ──► features ──► models ──► verdict + predictions.jsonl
+  │                                  │            │              │
+equities (30 tickers ×2y)      temperature    logistic P(up5d)  digest.md
+fred credit+vix                regime rules   constant baseline web/index.html
+manual capex csv               alerts         scoreboard eval   pages deploy
+
+commit data+site as bubblewatch-bot → GitHub Pages</pre>
+<p>The git repo is the database — every run commits new parquet rows, so history accrues in version
+control and any day can be replayed. Same architecture as our memory-cycle project GlutClock.</p>
+</div>
+
+<div class="card">
+<h2>Data sources</h2>
+<table>
+<tr><th>source</th><th>cadence</th><th>what / how</th></tr>
+<tr><td>Yahoo Finance → Stooq fallback</td><td>daily</td><td>22-name AI complex (NVDA AVGO AMD TSM MSFT GOOGL META AMZN AAPL ORCL CRM NOW PLTR SMCI ANET MRVL VRT ETN PWR DLR EQIX MU), 4 power/utilities names, SPY/RSP/QQQ/^SOX/^VIX/^TNX/BTC-USD; 750-day backfill</td></tr>
+<tr><td>FRED <code>fredgraph.csv</code></td><td>daily</td><td>US high-yield OAS (<code>BAMLH0A0HYM2</code>) and VIX close (<code>VIXCLS</code>) — pulled keyless from FRED's public CSV endpoint</td></tr>
+<tr><td>Manual CSV seed</td><td>quarterly</td><td>hyperscaler capex $B + NVDA revenue YoY per quarter in <code>data/manual/hyperscaler_capex.csv</code>; staleness surfaced on the dashboard</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>Design decisions worth knowing</h2>
+<ul>
+  <li><b>Baskets are compounded equal-weight returns</b>, never averaged prices — averaging prices
+  across listings with different histories breaks the moment a constituent starts trading (TLN).</li>
+  <li><b>Holiday gaps are forward-filled</b> before rolling windows; US calendars have single-day
+  holes that silently poison naive rolling stats.</li>
+  <li><b>Concentration is measured by price spread</b> (SPY vs RSP) rather than index weights —
+  historical shares-outstanding data isn't freely available daily; the cap-vs-equal-weight return
+  spread is the standard price-based proxy for the same phenomenon.</li>
+  <li><b>Z-scores use rolling 250-day windows (min 100)</b>, so "stretched" always means stretched
+  versus the recent year, not versus all history. Values clipped at ±2 so no single gauge can pin
+  the thermometer.</li>
+  <li><b>No lookahead:</b> supervised targets are future returns of the basket; training split is
+  chronological (first 80% train / last 20% test), never shuffled.</li>
+  <li><b>Ledger integrity:</b> each run stores a hash of its feature snapshot; scored outcomes join
+  back by run_date + horizon against realized basket returns.</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>Roadmap</h2>
+<table>
+<tr><th>v1</th><th>v2+</th></tr>
+<tr><td>
+<ul>
+<li>LightGBM direction model + isotonic calibration</li>
+<li>Bayesian changepoint alarm on temperature</li>
+<li>Automated NVDA quarterly pull via yfinance financials</li>
+<li>Shiller CAPE monthly context series</li>
+</ul></td>
+<td>
+<ul>
+<li>LLM news-event extractor (capex announcements, guidance cuts)</li>
+<li>Regime HMM replacing rule thresholds</li>
+<li>Email/Telegram digest delivery</li>
+<li>Cross-link signals with GlutClock (memory prices are downstream of this trade)</li>
+</ul></td>
+</tr>
+</table>
+</div>
+
+<div class="card">
+<h2>Honest limitations</h2>
+<div class="note warn"><ul>
+  <li>The AI complex has ~one observable boom in-sample; every z-score window overlaps it.
+  Statistical power is inherently low — treat temperature as ordinal (rising/falling, hot/cold),
+  not cardinal.</li>
+  <li>Five-day equity direction is barely predictable; expect test Brier near 0.24–0.25 forever.
+  The value is the calibration machinery, not the edge.</li>
+  <li>Fundamentals anchor depends on manual CSV updates between earnings seasons.</li>
+  <li>BTC is a noisy risk-appetite proxy (weight capped at 10%).</li>
+  <li>All of it: research tooling. Nothing here is investment advice.</li>
+</ul></div>
+</div>
+
+<footer>Source: github.com/TanishkBansode/bubblewatch · companion project: github.com/TanishkBansode/glutclock · not investment advice.</footer>
+</body>
+</html>

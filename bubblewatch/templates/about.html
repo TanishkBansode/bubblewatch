@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BubbleWatch · what is this?</title>
+<style>
+:root{--bg:#0b0e14;--card:#121722;--line:#1f2937;--fg:#dbe4f0;--dim:#6b7a90;--acc:#f59e0b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font:14px/1.6 ui-monospace,Menlo,Consolas,monospace;padding:24px;max-width:1000px;margin:0 auto}
+h1{font-size:18px;letter-spacing:.08em;margin-bottom:2px}
+h2{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.12em;margin:26px 0 10px}
+p{margin:8px 0;max-width:78ch}
+ul{margin:8px 0 8px 20px;max-width:78ch}li{margin:5px 0}
+a{color:var(--acc);text-decoration:none}
+code{background:#0f1420;border:1px solid var(--line);padding:1px 5px;border-radius:4px;font-size:12px;color:#93c5fd}
+pre{background:#0f1420;border:1px solid var(--line);border-radius:8px;padding:12px;overflow-x:auto;font-size:12px;margin:10px 0;max-width:84ch;line-height:1.45}
+.dim{color:var(--dim)}
+.note{border-left:3px solid var(--acc);background:#181207;padding:10px 14px;margin:14px 0;border-radius:0 8px 8px 0;max-width:78ch}
+.warn{border-left-color:#f87171;background:#1c1216}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-top:16px}
+.nav{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:20px;padding:12px 16px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:13px}
+.nav a{color:var(--fg)}.nav a:hover{color:var(--acc)}.nav .here{color:var(--acc)}
+footer{margin-top:26px;color:var(--dim);font-size:11px;line-height:1.6}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="index.html">dashboard</a>
+  <a class="here" href="about.html">what is this?</a>
+  <a href="guide.html">reading the numbers</a>
+  <a href="method.html">under the hood</a>
+</nav>
+
+<h1>WHAT IS BUBBLEWATCH?</h1>
+<p class="dim">A small automated research desk for one question: <b>how close is the AI trade to breaking — and when does it get cheap again?</b></p>
+
+<div class="card">
+<h2>The short version</h2>
+<p>A handful of mega-cap companies are pouring hundreds of billions of dollars a year into data
+centers, GPUs and power, on the bet that artificial intelligence revenue arrives fast enough to pay
+for it. That single trade now dominates equity indices, credit markets, utility buildouts and even
+memory prices (see our companion project, GlutClock). When one theme gets this big, its <i>cooling
+curve</i> matters to everyone.</p>
+<p>BubbleWatch is a program that wakes up daily, reads public signals of froth or stress — momentum
+stretch in the AI complex, crowding vs the boring equal-weight market, concentration, high-yield
+credit complacency, proximity-to-highs, crypto risk appetite — compresses them into a single
+<b>Bubble Temperature (0–100)</b>, classifies the regime, writes down a probability forecast for
+the next five days, and later scores itself against those forecasts publicly.</p>
+<p>It is a thermometer, not an oracle. The point is calibration and early warning, not predictions
+to bet on.</p>
+</div>
+
+<h2>Why bubbles follow a readable arc</h2>
+<pre>displacement → boom → EUPHORIA → profit-taking → PANIC → trough
+   (new tech)   (FOMO)  (this gauge     (smart money   (capitulation,
+                        maxes out)      exits first)   best entry zone)</pre>
+<ul>
+  <li><b>Melt-ups end in stages:</b> breadth deteriorates while index still rises (equal-weight lags), then credit stops flattering everything, then price breaks. The gauges track those stages in order.</li>
+  <li><b>Concentration cuts both ways.</b> Top-heavy indexes mean passive money mechanically amplifies whatever the top-10 does — up and especially down.</li>
+  <li><b>Credit is the adult in the room.</b> Equity investors can rationalize anything; high-yield bond investors demand payment. Spreads at record tights = no fear priced anywhere.</li>
+  <li><b>The fundamental anchor:</b> hyperscaler capex and NVDA growth. If capex growth decelerates while temperature stays hot, that's the classic divergence that precedes breaks.</li>
+</ul>
+
+<h2>What BubbleWatch is not</h2>
+<div class="note warn">
+<ul>
+  <li><b>Not investment advice.</b> It times nothing perfectly and will be wrong often — publicly, via its scoreboard.</li>
+  <li><b>Not a crash alarm.</b> Bubbles can stay hotter longer than any gauge can stay short. Temperature 80+ can persist for quarters.</li>
+  <li><b>Not sentiment from social media.</b> Only prices, credit and reported fundamentals — revealed preference, not vibes.</li>
+</ul>
+</div>
+
+<h2>Continue reading</h2>
+<ul>
+  <li><a href="guide.html">Reading the numbers</a> — the exact temperature formula, every regime state, every indicator's rule of thumb.</li>
+  <li><a href="method.html">Under the hood</a> — data sources, model design, validation rules, honest limitations.</li>
+</ul>
+
+<footer>BubbleWatch runs on GitHub Actions daily · data: Yahoo/Stooq quotes, FRED credit series, manually seeded fundamentals · not investment advice.</footer>
+</body>
+</html>

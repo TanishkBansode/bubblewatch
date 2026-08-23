@@ -1,0 +1,9 @@
+pandas
+pyarrow
+duckdb
+requests
+beautifulsoup4
+lxml
+scikit-learn
+yfinance
+tabulate
