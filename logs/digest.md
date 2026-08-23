@@ -1,4 +1,4 @@
-# BubbleWatch Daily Digest — 2026-08-23 17:13 UTC
+# BubbleWatch Daily Digest — 2026-08-23 17:15 UTC
 
 ## Verdict
 - **Bubble temperature:** **54/100** (warm) — gauge coverage 100%
@@ -37,7 +37,7 @@
 |---|---|---|---|
 | webgen | error | 0 | FileNotFoundError: [Errno 2] No such file or directory: '/home/tanx/project/bubb |
 | equities | ok | 24721 | total=24721 new_days=0 src=yfinance |
-| fred | ok | 1373 | total=1373 latest={'hy_oas': '2026-08-20', 'vix_cls': '2026-08-20'} |
+| fred | ok_stale | 0 | no fresh pulls succeeded |
 | capex | ok | 6 | total=6 latest_period=2025Q2 |
 
 ---
