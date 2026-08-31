@@ -48,3 +48,8 @@
 {"ts": "2026-08-30T06:20:36+00:00", "source": "fred", "status": "error", "rows": 0, "detail": "VIXCLS: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=30)"}
 {"ts": "2026-08-30T06:20:36+00:00", "source": "fred", "status": "ok_stale", "rows": 0, "detail": "no fresh pulls succeeded"}
 {"ts": "2026-08-30T06:20:36+00:00", "source": "capex", "status": "ok", "rows": 6, "detail": "total=6 latest_period=2025Q2"}
+{"ts": "2026-08-31T06:47:19+00:00", "source": "equities", "status": "ok", "rows": 24719, "detail": "total=24889 new_days=1 src=yfinance"}
+{"ts": "2026-08-31T06:47:49+00:00", "source": "fred", "status": "error", "rows": 0, "detail": "BAMLH0A0HYM2: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=30)"}
+{"ts": "2026-08-31T06:48:19+00:00", "source": "fred", "status": "error", "rows": 0, "detail": "VIXCLS: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=30)"}
+{"ts": "2026-08-31T06:48:19+00:00", "source": "fred", "status": "ok_stale", "rows": 0, "detail": "no fresh pulls succeeded"}
+{"ts": "2026-08-31T06:48:19+00:00", "source": "capex", "status": "ok", "rows": 6, "detail": "total=6 latest_period=2025Q2"}
