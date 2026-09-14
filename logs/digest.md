@@ -1,22 +1,22 @@
-# BubbleWatch Daily Digest — 2026-09-13 05:45 UTC
+# BubbleWatch Daily Digest — 2026-09-14 05:56 UTC
 
 ## Verdict
-- **Bubble temperature:** **52/100** (warm) — gauge coverage 80%
+- **Bubble temperature:** **58/100** (warm) — gauge coverage 80%
 - **Regime:** `expansion` — uptrend intact without froth extremes
 - **Model** P(AI complex up next 5d): **46%** (test Brier 0.2987 vs majority acc 0.662, asof 2026-08-25)
 
 ## Key indicators
 | Indicator | Value |
 |---|---|
-| Bubble temperature (0-100) | 52.50 |
+| Bubble temperature (0-100) | 58.10 |
 | Gauge coverage | 0.80 |
-| AI complex momentum 20d | 0.05 |
-| AI complex momentum 60d | 0.10 |
+| AI complex momentum 20d | 0.04 |
+| AI complex momentum 60d | 0.14 |
 | Drawdown from 250d high | -0.01 |
-| AI complex vs SPY 60d excess | 0.09 |
-| AI complex vs equal-weight S&P 60d | 0.10 |
-| Cap-vs-equal-weight spread 60d (concentration) | 0.00 |
-| Power/utilities theme momentum 60d | -0.07 |
+| AI complex vs SPY 60d excess | 0.12 |
+| AI complex vs equal-weight S&P 60d | 0.13 |
+| Cap-vs-equal-weight spread 60d (concentration) | 0.02 |
+| Power/utilities theme momentum 60d | -0.03 |
 | BTC momentum 30d (risk appetite) | 0.23 |
 | Hyperscaler capex, latest qtr ($B) | 88.00 |
 | Hyperscaler capex YoY (%) | 65.40 |
@@ -32,15 +32,15 @@
 ## Source status (this run)
 | Source | Status | Rows | Detail |
 |---|---|---|---|
-| equities | ok | 24720 | total=25191 new_days=1 src=yfinance |
+| equities | ok | 23970 | total=25192 new_days=1 src=yfinance |
 | fred | ok_stale | 0 | no fresh pulls succeeded |
 | capex | ok | 6 | total=6 latest_period=2025Q2 |
 
 ## Prediction scoreboard (vs baselines)
 | target            | model      |   n |   brier |   accuracy |
 |:------------------|:-----------|----:|--------:|-----------:|
-| AI_complex_dir_5d | p_model    |  20 |  0.2751 |       0.35 |
-| AI_complex_dir_5d | p_constant |  20 |  0.25   |       0.35 |
+| AI_complex_dir_5d | p_model    |  21 |  0.2761 |      0.333 |
+| AI_complex_dir_5d | p_constant |  21 |  0.25   |      0.333 |
 
 ---
 *Temperature = weighted z-composite; formula and weights published on the site. Baselines are permanent. Not investment advice.*
