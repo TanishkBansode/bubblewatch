@@ -1,23 +1,23 @@
-# BubbleWatch Daily Digest — 2026-09-26 05:58 UTC
+# BubbleWatch Daily Digest — 2026-09-27 06:24 UTC
 
 ## Verdict
-- **Bubble temperature:** **67/100** (hot) — gauge coverage 80%
-- **Regime:** `expansion` — uptrend intact without froth extremes
+- **Bubble temperature:** **72/100** (hot) — gauge coverage 80%
+- **Regime:** `euphoria` — temperature 72 with intact 60d trend
 - **Model** P(AI complex up next 5d): **46%** (test Brier 0.2987 vs majority acc 0.662, asof 2026-08-25)
 
 ## Key indicators
 | Indicator | Value |
 |---|---|
-| Bubble temperature (0-100) | 66.70 |
+| Bubble temperature (0-100) | 71.80 |
 | Gauge coverage | 0.80 |
 | AI complex momentum 20d | 0.03 |
-| AI complex momentum 60d | 0.20 |
+| AI complex momentum 60d | 0.24 |
 | Drawdown from 250d high | -0.01 |
-| AI complex vs SPY 60d excess | 0.14 |
-| AI complex vs equal-weight S&P 60d | 0.22 |
-| Cap-vs-equal-weight spread 60d (concentration) | 0.07 |
-| Power/utilities theme momentum 60d | -0.06 |
-| BTC momentum 30d (risk appetite) | 0.05 |
+| AI complex vs SPY 60d excess | 0.16 |
+| AI complex vs equal-weight S&P 60d | 0.24 |
+| Cap-vs-equal-weight spread 60d (concentration) | 0.08 |
+| Power/utilities theme momentum 60d | -0.04 |
+| BTC momentum 30d (risk appetite) | 0.09 |
 | Hyperscaler capex, latest qtr ($B) | 88.00 |
 | Hyperscaler capex YoY (%) | 65.40 |
 | NVDA revenue YoY (%) | 56.00 |
@@ -29,18 +29,21 @@
 |---|---|---|---|---|
 | AI_complex_dir_5d | 5d | 0.46 | 0.50 | logistic on equity+credit features; scored vs constant baseline |
 
+## Alerts
+- ⚠️ Bubble temperature in froth zone (72/100)
+
 ## Source status (this run)
 | Source | Status | Rows | Detail |
 |---|---|---|---|
-| equities | ok | 24720 | total=25524 new_days=1 src=yfinance |
+| equities | ok | 24720 | total=25525 new_days=1 src=yfinance |
 | fred | ok_stale | 0 | no fresh pulls succeeded |
 | capex | ok | 6 | total=6 latest_period=2025Q2 |
 
 ## Prediction scoreboard (vs baselines)
 | target            | model      |   n |   brier |   accuracy |
 |:------------------|:-----------|----:|--------:|-----------:|
-| AI_complex_dir_5d | p_model    |  33 |  0.2726 |      0.333 |
-| AI_complex_dir_5d | p_constant |  33 |  0.25   |      0.333 |
+| AI_complex_dir_5d | p_model    |  34 |  0.2707 |      0.353 |
+| AI_complex_dir_5d | p_constant |  34 |  0.25   |      0.353 |
 
 ---
 *Temperature = weighted z-composite; formula and weights published on the site. Baselines are permanent. Not investment advice.*
