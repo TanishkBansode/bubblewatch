@@ -1,23 +1,23 @@
-# BubbleWatch Daily Digest — 2026-09-29 06:40 UTC
+# BubbleWatch Daily Digest — 2026-09-30 06:23 UTC
 
 ## Verdict
-- **Bubble temperature:** **61/100** (hot) — gauge coverage 80%
+- **Bubble temperature:** **60/100** (warm) — gauge coverage 80%
 - **Regime:** `expansion` — uptrend intact without froth extremes
 - **Model** P(AI complex up next 5d): **46%** (test Brier 0.2987 vs majority acc 0.662, asof 2026-08-25)
 
 ## Key indicators
 | Indicator | Value |
 |---|---|
-| Bubble temperature (0-100) | 60.60 |
+| Bubble temperature (0-100) | 59.90 |
 | Gauge coverage | 0.80 |
-| AI complex momentum 20d | 0.02 |
+| AI complex momentum 20d | 0.04 |
 | AI complex momentum 60d | 0.14 |
 | Drawdown from 250d high | -0.02 |
 | AI complex vs SPY 60d excess | 0.11 |
 | AI complex vs equal-weight S&P 60d | 0.16 |
 | Cap-vs-equal-weight spread 60d (concentration) | 0.05 |
-| Power/utilities theme momentum 60d | -0.07 |
-| BTC momentum 30d (risk appetite) | 0.08 |
+| Power/utilities theme momentum 60d | -0.05 |
+| BTC momentum 30d (risk appetite) | 0.06 |
 | Hyperscaler capex, latest qtr ($B) | 88.00 |
 | Hyperscaler capex YoY (%) | 65.40 |
 | NVDA revenue YoY (%) | 56.00 |
@@ -32,15 +32,15 @@
 ## Source status (this run)
 | Source | Status | Rows | Detail |
 |---|---|---|---|
-| equities | ok | 24720 | total=25559 new_days=1 src=yfinance |
+| equities | ok | 24720 | total=25592 new_days=1 src=yfinance |
 | fred | ok_stale | 0 | no fresh pulls succeeded |
 | capex | ok | 6 | total=6 latest_period=2025Q2 |
 
 ## Prediction scoreboard (vs baselines)
 | target            | model      |   n |   brier |   accuracy |
 |:------------------|:-----------|----:|--------:|-----------:|
-| AI_complex_dir_5d | p_model    |  36 |  0.2672 |      0.389 |
-| AI_complex_dir_5d | p_constant |  36 |  0.25   |      0.389 |
+| AI_complex_dir_5d | p_model    |  37 |  0.2656 |      0.405 |
+| AI_complex_dir_5d | p_constant |  37 |  0.25   |      0.405 |
 
 ---
 *Temperature = weighted z-composite; formula and weights published on the site. Baselines are permanent. Not investment advice.*
