@@ -1,4 +1,4 @@
-# BubbleWatch Daily Digest — 2026-10-04 05:47 UTC
+# BubbleWatch Daily Digest — 2026-10-04 05:55 UTC
 
 ## Verdict
 - **Bubble temperature:** **58/100** (warm) — gauge coverage 100%
@@ -40,7 +40,7 @@
 ## Source status (this run)
 | Source | Status | Rows | Detail |
 |---|---|---|---|
-| equities | ok | 24720 | total=25692 new_days=1 src=yfinance |
+| equities | ok | 24720 | total=25692 new_days=0 src=yfinance |
 | fred | ok | 22 | total=1433 latest={'hy_oas': '2026-10-01', 'vix_cls': '2026-10-01'} |
 | capex | ok | 10 | total=10 latest_period=2026Q2 |
 
