@@ -44,4 +44,9 @@ The dashboard surfaces staleness automatically.
 - Schedule: daily 01:00 UTC (+ manual dispatch). The bot commits `data logs web` — always
   `git pull --rebase` before pushing local changes.
 - Seed values through 2025Q2 are approximate from earnings releases; verify before trusting.
-- Not investment advice. See `templates/guide.html` for the exact temperature formula.
+## Disclaimers & Legal Notice
+
+- **Not investment advice:** BubbleWatch is an educational and quantitative research project. It does not provide financial, investment, legal, tax, or accounting advice. All data and predictions are provided strictly "as is".
+- **Regulatory Disclosures & Terms:** See the [Legal Center](web/legal.html) for comprehensive regulatory disclosures, machine learning model limitations, terms of service, and zero-tracking privacy policy.
+- **License:** Open source under the [MIT License](LICENSE).
+

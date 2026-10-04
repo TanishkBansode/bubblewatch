@@ -12,7 +12,16 @@ from .features import basket_index, market_closes
 _WEB_DIR = config.BASE_DIR / "web"
 _TEMPLATE = Path(__file__).parent / "templates" / "dashboard.html"
 _PLACEHOLDER = "__BUBBLEWATCH_PAYLOAD__"
-_STATIC_PAGES = ["about.html", "guide.html", "method.html", "plain.html"]
+_STATIC_PAGES = [
+    "about.html",
+    "guide.html",
+    "method.html",
+    "plain.html",
+    "legal.html",
+    "disclaimer.html",
+    "terms.html",
+    "privacy.html",
+]
 _ASSETS_DIR = Path(__file__).parent / "templates" / "assets"
 
 

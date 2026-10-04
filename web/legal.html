@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BubbleWatch · Legal Disclaimers, Terms of Service &amp; Privacy Policy</title>
+<meta name="description" content="Official legal documentation for BubbleWatch, including investment and financial advice disclaimers, machine learning model limitations, terms of service, and zero-tracking privacy policy.">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.legal-nav-sticky {
+  position: sticky;
+  top: 10px;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(16, 19, 26, 0.88);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  margin: 18px 0 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.legal-nav-sticky a {
+  font-size: 11.5px;
+  color: var(--dim);
+  text-decoration: none;
+  padding: 4px 9px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  transition: all 0.15s ease;
+}
+.legal-nav-sticky a:hover {
+  color: var(--fg);
+  background: rgba(94, 106, 210, 0.18);
+  border-color: rgba(94, 106, 210, 0.45);
+}
+.legal-card {
+  scroll-margin-top: 64px;
+}
+.legal-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin: 18px 0 8px;
+}
+.legal-summary-item {
+  background: var(--card-inner);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.legal-summary-item h3 {
+  font-size: 13px;
+  color: var(--fg);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.legal-summary-item p {
+  font-size: 12px;
+  color: var(--dim);
+  line-height: 1.5;
+}
+.prose {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: #d1d5db;
+}
+.prose p {
+  margin-bottom: 12px;
+}
+.prose ul, .prose ol {
+  margin: 10px 0 14px 22px;
+  line-height: 1.7;
+}
+.prose li {
+  margin: 5px 0;
+}
+.prose strong {
+  color: var(--fg);
+}
+.badge-tag {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="nav">
+  <a href="index.html">← Dashboard</a>
+  <a href="plain.html">Plain-English Visual Guide <span class="pill-new">Start Here</span></a>
+  <a href="about.html">What is this?</a>
+  <a href="guide.html">Formula &amp; Technical Guide</a>
+  <a href="method.html">Under the Hood</a>
+  <a class="here" href="legal.html">Legal &amp; Disclaimers</a>
+</nav>
+
+<div style="margin-bottom:20px;">
+  <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+    <span class="chip warn">Official Documentation</span>
+    <span class="dim mono" style="font-size:12px;">Last Modified: October 2026</span>
+  </div>
+  <h1>LEGAL DISCLOSURES, TERMS &amp; PRIVACY POLICY</h1>
+  <p class="dim" style="font-size:15px; margin-top:4px;">
+    Comprehensive regulatory disclaimers, machine learning model limitations, terms of service, and zero-tracking privacy policy governing the BubbleWatch research project.
+  </p>
+</div>
+
+<!-- Executive Summary Callout -->
+<div class="legal-highlight-box">
+  <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+    <span style="font-size:18px;">⚠️</span>
+    <strong style="color:#fecaca; font-size:14px; text-transform:uppercase; letter-spacing:0.04em;">Executive Legal Summary · Read First</strong>
+  </div>
+  <p style="font-size:13.5px; color:#fca5a5; line-height:1.6; margin-bottom:12px;">
+    BubbleWatch is an <strong>open-source educational and quantitative research project</strong>. It does not provide financial, investment, legal, tax, or accounting advice. All data, temperatures, regime classifications, and machine learning probabilities are provided strictly <strong>"AS IS"</strong> with zero warranty and zero liability.
+  </p>
+  <div class="legal-summary-grid">
+    <div class="legal-summary-item" style="border-left: 3px solid var(--danger);">
+      <h3><span>🚫</span> Not Financial Advice</h3>
+      <p>We are not licensed investment advisors or broker-dealers. Never buy, sell, or hedge any security based on this website. Capital is at risk.</p>
+    </div>
+    <div class="legal-summary-item" style="border-left: 3px solid var(--primary);">
+      <h3><span>🛡️</span> Zero Data Tracking</h3>
+      <p>No user accounts, no tracking cookies, no marketing beacons, no personal data collection or sale. Complete privacy by design.</p>
+    </div>
+    <div class="legal-summary-item" style="border-left: 3px solid var(--warn);">
+      <h3><span>⚖️</span> Complete Liability Waiver</h3>
+      <p>Published under the MIT License. Authors and contributors assume zero liability for any trading, portfolio, or financial losses.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Navigation Pill Bar -->
+<div class="legal-nav-sticky" id="quick-links">
+  <span class="dim mono" style="font-size:11px; margin-right:4px;">JUMP TO:</span>
+  <a href="#disclaimer">1. Financial Disclaimer</a>
+  <a href="#models">2. Model Limitations</a>
+  <a href="#data">3. Data &amp; Accuracy</a>
+  <a href="#trademarks">4. Trademarks</a>
+  <a href="#terms">5. Terms of Service</a>
+  <a href="#privacy">6. Privacy &amp; Cookies</a>
+  <a href="#license">7. Open Source License</a>
+  <a href="#contact">8. Inquiries</a>
+</div>
+
+<!-- 1. Financial & Investment Advice Disclaimer -->
+<section class="card legal-card" id="disclaimer">
+  <div class="legal-header">
+    <h2>1 · Investment &amp; Financial Advice Disclaimer</h2>
+    <span class="chip hot">Mandatory Regulatory Notice</span>
+  </div>
+  <div class="prose">
+    <p>
+      <strong>1.1 Educational &amp; Quantitative Research Use Only.</strong> All content, indices, calculations, metrics, regime tags, direction probabilities, visualizations, and written analyses published on BubbleWatch (accessible via <a href="https://tanishkbansode.github.io/bubblewatch/">https://tanishkbansode.github.io/bubblewatch/</a> or its code repositories) are provided strictly for <strong>educational, informational, and academic research purposes only</strong>.
+    </p>
+    <p>
+      <strong>1.2 Not Financial, Investment, Legal, Accounting, or Tax Advice.</strong> Nothing published on or disseminated by BubbleWatch constitutes, or should be construed as, professional financial advice, investment advice, trading advice, asset allocation counsel, legal advice, or tax advice. No information on this website constitutes a personal recommendation, solicitation, endorsement, sponsorship, or offer to buy, sell, hold, or write any stock, option, ETF, index, future, cryptocurrency, bond, credit instrument, or other financial asset or derivative.
+    </p>
+    <p>
+      <strong>1.3 No Broker-Dealer or Advisory Relationship.</strong> BubbleWatch, its creators, developers, authors, and contributors are <strong>not</strong> registered investment advisors (RIAs), registered broker-dealers, commodity trading advisors (CTAs), financial planners, or financial analysts under the rules of the U.S. Securities and Exchange Commission (SEC), the Financial Industry Regulatory Authority (FINRA), the Commodity Futures Trading Commission (CFTC), the UK Financial Conduct Authority (FCA), the European Securities and Markets Authority (ESMA), the Securities and Exchange Board of India (SEBI), or any corresponding national or international regulatory authority. Your access to or use of this website does not establish any fiduciary, advisory, contractual, or commercial relationship between you and BubbleWatch.
+    </p>
+    <p>
+      <strong>1.4 High Risk of Financial Loss.</strong> Investment and trading in equities (particularly high-beta semiconductor and artificial intelligence technology companies), options, exchange-traded products, corporate credit instruments, and digital assets involve a <strong>substantial risk of capital loss</strong>, up to and including the complete loss of your initial investment. Financial markets are subject to sudden shifts, extreme volatility, liquidity shocks, systemic disruptions, and regulatory interventions. You should never commit capital that you cannot afford to lose completely.
+    </p>
+    <p>
+      <strong>1.5 Obligation to Conduct Independent Due Diligence.</strong> You expressly agree that you will not base any investment, divestment, trading, hedging, or capital allocation decision upon any metric, temperature reading, regime classification, or probabilistic forecast produced by BubbleWatch. You are solely responsible for conducting your own independent due diligence, financial evaluation, and risk assessment. Before making any investment or financial decision, you must consult with a qualified, licensed, independent financial advisor, certified financial planner (CFP), or registered investment professional.
+    </p>
+    <p>
+      <strong>1.6 Past Performance &amp; Backtesting Are Not Predictive.</strong> Any historical returns, past correlation data, backtested statistical distributions, historical rolling z-scores, or historical model evaluations (including Brier scores or out-of-sample directional accuracy) displayed on this website are historical artifacts. <strong>Past performance, whether actual or simulated, is no guarantee, representation, or indicator of future performance.</strong>
+    </p>
+  </div>
+</section>
+
+<!-- 2. Machine Learning, Algorithmic & Quantitative Model Limitations -->
+<section class="card legal-card" id="models">
+  <div class="legal-header">
+    <h2>2 · Algorithmic, Probability &amp; Model Limitations</h2>
+    <span class="chip warn">Algorithmic Risk</span>
+  </div>
+  <div class="prose">
+    <p>
+      <strong>2.1 Nature of the Bubble Temperature Score.</strong> The 0–100 Bubble Temperature is a <em>synthetic heuristic index</em> constructed from an unweighted and weighted mathematical combination of six rolling standardized scores (z-scores) computed over an empirical lookback window of approximately 250 trading days. The weights (20% momentum stretch, 20% credit tightness, 20% drawdown proximity, 15% equal-weight relative strength, 15% index concentration, 10% crypto speculative momentum) were chosen by heuristic design. The Temperature does not represent an absolute economic truth, does not measure underlying company cash flows, does not predict market tops or market bottoms, and cannot forecast the exact timing or magnitude of any market correction.
+    </p>
+    <p>
+      <strong>2.2 The 5-Day Direction Forecast Model.</strong> The direction model provides an estimate of <code>P(AI complex up next 5d)</code> using an L2-regularized logistic regression trained on chronological splits of past market sessions. You acknowledge that:
+    </p>
+    <ul>
+      <li><strong>Noise &amp; Random Walk:</strong> Short-term (5-day) equity price fluctuations exhibit very high entropy and noise, and often closely approximate a random walk. Model probabilities will frequently hover between 45% and 55%.</li>
+      <li><strong>Baseline Performance:</strong> Predicting an uninformative constant probability of 0.50 yields an expected Brier score of 0.2500. A statistical model achieving a Brier score of 0.2450 does not represent an exploitable trading edge or an actionable market signal.</li>
+      <li><strong>Omission of Unquantifiable Variables:</strong> The model cannot ingest real-time breaking geopolitical news, central bank speech nuances, corporate fraud revelations, military conflicts, or surprise regulatory bans.</li>
+    </ul>
+    <p>
+      <strong>2.3 Structural Breaks &amp; Model Drift.</strong> Financial markets are non-stationary complex systems. Historical statistical relationships between variables (such as credit spreads and equity momentum) can break down permanently during new macroeconomic regimes, changes in interest rate policy, or structural shifts in the technology hardware supply chain. BubbleWatch models are subject to degradation, model drift, and misspecification.
+    </p>
+    <p>
+      <strong>2.4 Transparent Scoreboard Disclaimer.</strong> The public prediction scoreboard logged in <code>data/ledger.jsonl</code> is designed as an open-source research exercise in algorithmic accountability. It is not an audited track record of trading profits or an endorsement of any algorithmic trading system.
+    </p>
+  </div>
+</section>
+
+<!-- 3. Data Sources, Accuracy, Delays & Availability -->
+<section class="card legal-card" id="data">
+  <div class="legal-header">
+    <h2>3 · Data Integrity, Third-Party Sources &amp; Delays</h2>
+    <span class="chip">Data Disclosures</span>
+  </div>
+  <div class="prose">
+    <p>
+      <strong>3.1 Ingestion Sources.</strong> BubbleWatch obtains raw market and economic data from publicly accessible third-party APIs and sources:
+    </p>
+    <ul>
+      <li><strong>Equity &amp; Benchmark Quotes:</strong> Ingested daily from Yahoo! Finance and Stooq public endpoints.</li>
+      <li><strong>High-Yield Credit &amp; Volatility Data:</strong> Ingested from the Federal Reserve Bank of St. Louis Economic Data (FRED®) service (ICE BofA US High Yield Index Option-Adjusted Spread and Cboe VIX).</li>
+      <li><strong>Quarterly CapEx &amp; Revenue Growth:</strong> Transcribed from public corporate 10-Q and 10-K regulatory filings with the U.S. Securities and Exchange Commission (SEC) for Alphabet, Amazon, Meta, Microsoft, and NVIDIA.</li>
+    </ul>
+    <p>
+      <strong>3.2 "AS IS" and "AS AVAILABLE" Basis.</strong> All data feeds, raw values, processed features, tables, charts, and downloadable artifacts are provided strictly on an <strong>"AS IS"</strong> and <strong>"AS AVAILABLE"</strong> basis. BubbleWatch makes no warranties, express or implied, regarding the accuracy, completeness, timeliness, reliability, suitability, or correctness of any data point.
+    </p>
+    <p>
+      <strong>3.3 Inherent Latency &amp; Reporting Lags.</strong> Market data on this website is subject to delays:
+    </p>
+    <ul>
+      <li>Equity market closing prices are processed after market close and are not tick-by-tick real-time streaming data.</li>
+      <li>FRED High-Yield OAS readings are typically published with an inherent 1 to 3 business day reporting lag by the Federal Reserve Bank of St. Louis.</li>
+      <li>Hyperscaler CapEx numbers update only once every calendar quarter (approximately 90 days) following quarterly earnings releases and may be subject to subsequent corporate restatements or accounting changes.</li>
+    </ul>
+    <p>
+      <strong>3.4 Downtime &amp; Pipeline Interruptions.</strong> BubbleWatch operates via automated GitHub Actions cron schedules. Automated runs may fail, be delayed, or be skipped due to upstream API rate limits, third-party network outages, server maintenance, or parsing errors. BubbleWatch provides no guarantee of continuous, uninterrupted, or timely publication.
+    </p>
+  </div>
+</section>
+
+<!-- 4. Third-Party Trademarks & Fair Use -->
+<section class="card legal-card" id="trademarks">
+  <div class="legal-header">
+    <h2>4 · Trademarks &amp; Nominative Fair Use</h2>
+    <span class="chip">Intellectual Property</span>
+  </div>
+  <div class="prose">
+    <p>
+      <strong>4.1 Third-Party Trademarks.</strong> All product names, logos, brands, ticker symbols, company names, and registered trademarks displayed or cited on BubbleWatch are the property of their respective trademark holders. These include, without limitation:
+    </p>
+    <ul>
+      <li><strong>NVIDIA®</strong> is a registered trademark of NVIDIA Corporation.</li>
+      <li><strong>Microsoft®</strong> is a registered trademark of Microsoft Corporation.</li>
+      <li><strong>Google® &amp; Alphabet®</strong> are registered trademarks of Google LLC / Alphabet Inc.</li>
+      <li><strong>Amazon® &amp; AWS®</strong> are registered trademarks of Amazon.com, Inc.</li>
+      <li><strong>Meta®</strong> is a registered trademark of Meta Platforms, Inc.</li>
+      <li><strong>Apple®</strong> is a registered trademark of Apple Inc.</li>
+      <li><strong>Broadcom®</strong> is a registered trademark of Broadcom Inc.</li>
+      <li><strong>TSMC®</strong> is a registered trademark of Taiwan Semiconductor Manufacturing Company Limited.</li>
+      <li><strong>ASML®</strong> is a registered trademark of ASML Holding N.V.</li>
+      <li><strong>S&amp;P 500®, SPY®, and RSP®</strong> are registered trademarks of Standard &amp; Poor’s Financial Services LLC / S&amp;P Global Inc. / State Street Global Advisors / Invesco.</li>
+      <li><strong>FRED®</strong> is a registered trademark of the Federal Reserve Bank of St. Louis.</li>
+    </ul>
+    <p>
+      <strong>4.2 Nominative Fair Use.</strong> The use of any trademark, trade name, or ticker symbol on BubbleWatch is strictly for <strong>nominative, descriptive, research, and identification purposes</strong> to refer to the respective companies, underlying securities, or data providers. Use of these names does not imply any affiliation with, endorsement by, sponsorship by, or commercial partnership with BubbleWatch or its creators.
+    </p>
+  </div>
+</section>
+
+<!-- 5. Terms of Service & Limitation of Liability -->
+<section class="card legal-card" id="terms">
+  <div class="legal-header">
+    <h2>5 · Terms of Service &amp; Limitation of Liability</h2>
+    <span class="chip hot">Binding Agreement</span>
+  </div>
+  <div class="prose">
+    <p>
+      <strong>5.1 Agreement to Terms.</strong> By visiting, browsing, viewing, caching, downloading, querying, or using BubbleWatch (the "Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms in their entirety, you must immediately terminate your use of this website.
+    </p>
+    <p>
+      <strong>5.2 Permitted Use.</strong> You are granted a non-exclusive, revocable, non-transferable license to access and view the dashboard and documentation for your personal, non-commercial, academic, and research purposes.
+    </p>
+    <p>
+      <strong>5.3 Prohibited Conduct.</strong> You agree that you will not:
+    </p>
+    <ul>
+      <li>Deploy automated bots, denial-of-service (DDoS) tools, or excessive scraping requests that impair the performance, bandwidth, or availability of the website for other users.</li>
+      <li>Attempt to probe, scan, or exploit vulnerabilities in the GitHub Pages hosting infrastructure or Content Delivery Networks.</li>
+      <li>Use the site’s data or outputs in furtherance of unlawful market manipulation, securities fraud, insider trading, or violation of any local or international securities laws.</li>
+      <li>Misrepresent BubbleWatch as an official, licensed, or regulated financial advisory platform.</li>
+    </ul>
+    <p>
+      <strong>5.4 Statutory Disclaimer of All Warranties.</strong>
+    </p>
+    <div class="legal-caps">
+      THE SERVICE, INCLUDING ALL INFORMATION, DATA, CODE, GAUGES, TEMPERATURE READINGS, REGIME CLASSIFICATIONS, MODEL ESTIMATES, AND CHARTS, IS PROVIDED STRICTLY ON AN "AS IS" AND "AS AVAILABLE" BASIS, WITHOUT WARRANTY OF ANY KIND. TO THE FULLEST EXTENT PERMISSIBLE UNDER APPLICABLE LAW, THE AUTHORS, MAINTAINERS, AND CONTRIBUTORS EXPRESSLY DISCLAIM ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING WITHOUT LIMITATION WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, QUIET ENJOYMENT, ACCURACY, NON-INFRINGEMENT, AND FREEDOM FROM COMPUTER VIRUSES OR HARMFUL COMPONENTS.
+    </div>
+    <p>
+      <strong>5.5 Comprehensive Limitation of Liability.</strong>
+    </p>
+    <div class="legal-caps">
+      TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL BUBBLEWATCH, TANISHK BANSODE, OR ANY OF ITS DEVELOPERS, MAINTAINERS, CONTRIBUTORS, LICENSORS, OR REPOSITORY COLLABORATORS BE LIABLE TO YOU OR ANY THIRD PARTY FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF TRADING PROFITS, CAPITAL LOSSES, FINANCIAL DEPLETION, LOSS OF BUSINESS, LOSS OF DATA, LOSS OF REPUTATION, GOODWILL, OR BUSINESS INTERRUPTION) ARISING OUT OF OR IN CONNECTION WITH THE ACCESS, USE, RELIANCE UPON, OR INABILITY TO USE THIS SERVICE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, AND REGARDLESS OF THE LEGAL OR EQUITABLE THEORY (WHETHER IN CONTRACT, TORT, STRICT LIABILITY, NEGLIGENCE, STATUTORY, OR OTHERWISE).
+    </div>
+    <p>
+      <strong>5.6 User Assumption of Risk &amp; Indemnification.</strong> You assume total responsibility and risk for your use of this website. You agree to defend, indemnify, and hold harmless BubbleWatch, its creators, maintainers, and contributors from and against any and all claims, actions, demands, liabilities, damages, judgments, losses, costs, and expenses (including reasonable legal and attorney fees) arising from or relating to your violation of these Terms, your misuse of the site, or your financial trading decisions.
+    </p>
+    <p>
+      <strong>5.7 Modifications to Terms &amp; Termination.</strong> BubbleWatch reserves the right, in its sole discretion, to modify, update, or discontinue any aspect of the website, algorithms, features, or these Terms at any time without prior notice. Continued use of the website following any modifications constitutes your acceptance of the updated Terms.
+    </p>
+  </div>
+</section>
+
+<!-- 6. Privacy Policy & Zero-Tracking Architecture -->
+<section class="card legal-card" id="privacy">
+  <div class="legal-header">
+    <h2>6 · Privacy Policy &amp; Cookie Disclosure</h2>
+    <span class="chip ok">Zero Tracking · Privacy by Design</span>
+  </div>
+  <div class="prose">
+    <p>
+      <strong>6.1 Privacy by Design Commitment.</strong> BubbleWatch is committed to extreme user privacy. We believe financial and technical research tools should respect your digital autonomy. We do not monetize user data, we do not profile your browsing habits, and we do not sell or trade your information.
+    </p>
+    <div class="legal-highlight-box green">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+        <span style="font-size:16px;">🛡️</span>
+        <strong style="color:#6ee7b7; font-size:13px; text-transform:uppercase;">What We Do NOT Collect</strong>
+      </div>
+      <p style="font-size:13px; color:#a7f3d0; margin-bottom:0;">
+        BubbleWatch does <strong>not</strong> collect names, email addresses, phone numbers, payment details, physical addresses, social media profiles, or any personally identifiable information (PII). There are no sign-up forms, user accounts, paywalls, or newsletters on this website.
+      </p>
+    </div>
+    <p>
+      <strong>6.2 Hosting Infrastructure &amp; Technical Server Logs.</strong> BubbleWatch is hosted statically via <strong>GitHub Pages</strong>, a service operated by GitHub, Inc. (a subsidiary of Microsoft Corporation). When your browser connects to GitHub Pages, GitHub’s edge servers may automatically record standard technical access log entries, including:
+    </p>
+    <ul>
+      <li>Your IP address (used for network routing, security rate-limiting, and DDoS mitigation);</li>
+      <li>The date and timestamp of your HTTP request;</li>
+      <li>The URL path requested;</li>
+      <li>HTTP response status codes;</li>
+      <li>Browser User-Agent header and referring URL.</li>
+    </ul>
+    <p>
+      These technical logs are maintained and processed exclusively by GitHub in accordance with the <a href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement" target="_blank" rel="noopener">GitHub Privacy Statement</a> for security, infrastructure health, and legal compliance. BubbleWatch does not receive, export, or store these server logs.
+    </p>
+    <p>
+      <strong>6.3 Content Delivery Networks (CDNs).</strong> To render interactive market charts, BubbleWatch loads the Chart.js visualization library from the <a href="https://www.jsdelivr.com/" target="_blank" rel="noopener">jsDelivr</a> public CDN. When your web browser fetches this script, your browser communicates with jsDelivr’s CDN servers, which transmit standard HTTP request headers. jsDelivr handles these technical requests according to their public privacy policy.
+    </p>
+    <p>
+      <strong>6.4 Cookies &amp; Local Storage Disclosure.</strong>
+    </p>
+    <ul>
+      <li><strong>Tracking Cookies:</strong> BubbleWatch sets <strong>ZERO</strong> first-party tracking cookies, marketing cookies, or behavioral analytics cookies. We do not use Google Analytics, Meta Pixel, Hotjar, or any ad networks.</li>
+      <li><strong>Third-Party Cookies:</strong> No commercial third-party cookies are injected into your browser by BubbleWatch.</li>
+      <li><strong>Client-Side Local Storage:</strong> Interactive features (such as temperature simulation sliders or UI theme toggles) execute purely in your browser's local memory or HTML5 <code>localStorage</code>. No preference data is ever transmitted back to any BubbleWatch server.</li>
+    </ul>
+    <p>
+      <strong>6.5 Global Privacy Regulations (GDPR, CCPA/CPRA &amp; DPDP).</strong> Because BubbleWatch does not collect, retain, process, monetize, or transfer personal data or maintain a database of user identities:
+    </p>
+    <ul>
+      <li><strong>GDPR (EU &amp; UK):</strong> There is no personal data processing to restrict, no user profiles to delete, and no automated profiling or automated decision-making applied to natural persons.</li>
+      <li><strong>CCPA / CPRA (California):</strong> We do not sell or share personal information of any consumer for cross-context behavioral advertising.</li>
+      <li><strong>DPDP (India):</strong> No digital personal data is acquired, processed, or stored by BubbleWatch.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 7. Open Source License & Attribution -->
+<section class="card legal-card" id="license">
+  <div class="legal-header">
+    <h2>7 · Open-Source Licensing &amp; Copyright</h2>
+    <span class="chip primary">MIT License</span>
+  </div>
+  <div class="prose">
+    <p>
+      <strong>7.1 MIT Open Source License.</strong> The BubbleWatch software, pipeline scripts, feature engines, and dashboard templates are open-source software released under the terms of the MIT License:
+    </p>
+    <pre>MIT License
+
+Copyright (c) 2025–2026 BubbleWatch Authors &amp; Contributors (Tanishk Bansode)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</pre>
+    <p>
+      <strong>7.2 Source Code Repository.</strong> The full, uncompressed source code, feature engineering scripts, data schemas, and pipeline logs are publicly auditable on GitHub: <a href="https://github.com/TanishkBansode/bubblewatch" target="_blank" rel="noopener">https://github.com/TanishkBansode/bubblewatch</a>.
+    </p>
+  </div>
+</section>
+
+<!-- 8. Contact, Inquiries & Bug Reports -->
+<section class="card legal-card" id="contact">
+  <div class="legal-header">
+    <h2>8 · Inquiries, Issue Reporting &amp; Governance</h2>
+    <span class="chip">Governance</span>
+  </div>
+  <div class="prose">
+    <p>
+      <strong>8.1 Inquiries &amp; Corrections.</strong> If you notice an error in data calculations, a bug in the direction model evaluation, an erroneous CapEx entry, or have a legal inquiry regarding this documentation, please open an issue on the public GitHub issue tracker:
+    </p>
+    <p>
+      <a href="https://github.com/TanishkBansode/bubblewatch/issues" target="_blank" rel="noopener" class="btn-guide" style="display:inline-flex;">
+        Open GitHub Issue / Inquiry →
+      </a>
+    </p>
+    <p class="dim" style="font-size:12px; margin-top:10px;">
+      Because BubbleWatch is maintained as an open-source research initiative, community contributions, pull requests, and audit verifications are welcomed and encouraged.
+    </p>
+  </div>
+</section>
+
+<!-- Rich Global Footer -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-col">
+      <h3>BubbleWatch Research</h3>
+      <p style="font-size:12.5px; color:var(--dim); margin-bottom:12px;">
+        An automated open-source research desk monitoring the AI equity complex, credit spreads, hyperscaler capital expenditures, and concentration signals.
+      </p>
+      <p style="font-size:11.5px; color:var(--faint);">
+        Educational &amp; research project only. Not registered with SEC, FINRA, CFTC, FCA, or SEBI. Not investment or financial advice.
+      </p>
+    </div>
+    <div class="footer-col">
+      <h3>Research Guides</h3>
+      <ul>
+        <li><a href="index.html">Live Dashboard</a></li>
+        <li><a href="plain.html">Plain-English Visual Guide</a></li>
+        <li><a href="about.html">What is BubbleWatch?</a></li>
+        <li><a href="guide.html">Formulas &amp; Technical Guide</a></li>
+        <li><a href="method.html">Methodology &amp; Pipeline</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h3>Legal &amp; Policy</h3>
+      <ul>
+        <li><a href="legal.html#disclaimer">Investment Disclaimer</a></li>
+        <li><a href="legal.html#models">Algorithmic Limitations</a></li>
+        <li><a href="legal.html#data">Data Sources &amp; Accuracy</a></li>
+        <li><a href="legal.html#trademarks">Third-Party Trademarks</a></li>
+        <li><a href="legal.html#terms">Terms of Service</a></li>
+        <li><a href="legal.html#privacy">Privacy &amp; Cookies</a></li>
+        <li><a href="legal.html#license">MIT License</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>
+      BubbleWatch © 2025–2026 · Open-source AI-cycle monitor · Released under MIT License
+    </div>
+    <div>
+      <a href="https://github.com/TanishkBansode/bubblewatch" target="_blank" rel="noopener">GitHub Repository</a> · 
+      <a href="legal.html">Legal Center</a>
+    </div>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>
