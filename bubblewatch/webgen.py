@@ -12,7 +12,8 @@ from .features import basket_index, market_closes
 _WEB_DIR = config.BASE_DIR / "web"
 _TEMPLATE = Path(__file__).parent / "templates" / "dashboard.html"
 _PLACEHOLDER = "__BUBBLEWATCH_PAYLOAD__"
-_STATIC_PAGES = ["about.html", "guide.html", "method.html"]
+_STATIC_PAGES = ["about.html", "guide.html", "method.html", "plain.html"]
+_ASSETS_DIR = Path(__file__).parent / "templates" / "assets"
 
 
 def _rebased(closes: pd.DataFrame, series: dict[str, pd.Series]) -> dict:
@@ -147,6 +148,19 @@ def build(state: dict | None = None) -> Path:
     except Exception:
         pass
 
+    gauges_data = [
+        {
+            "key": g["key"],
+            "name": g["name"],
+            "question": g["question"],
+            "source": g["source"],
+            "weight": config.TEMP_WEIGHTS.get(g["key"], 0.0),
+            "z": snap.get(g["key"]),
+            "raw": snap.get(g["source"]),
+        }
+        for g in config.GAUGES
+    ]
+
     payload = {
         "generated": pd.Timestamp.utcnow().isoformat(timespec="seconds"),
         "modelVersion": config.MODEL_VERSION,
@@ -155,6 +169,7 @@ def build(state: dict | None = None) -> Path:
         "regime": {"label": regime[0], "reason": regime[1]},
         "proxy": proxy,
         "preds": preds,
+        "gauges": gauges_data,
         "charts": charts,
         "indicators": _indicator_rows(snap),
         "fundamentals": _fundamentals(capex),
@@ -164,8 +179,17 @@ def build(state: dict | None = None) -> Path:
 
     html = _TEMPLATE.read_text().replace(_PLACEHOLDER, json.dumps(payload, default=str).replace("</", "<\\/"))
     _WEB_DIR.mkdir(parents=True, exist_ok=True)
+
+    if _ASSETS_DIR.exists():
+        target_assets = _WEB_DIR / "assets"
+        target_assets.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(_ASSETS_DIR, target_assets, dirs_exist_ok=True)
+
     for page in _STATIC_PAGES:
-        shutil.copyfile(_TEMPLATE.parent / page, _WEB_DIR / page)
+        src = _TEMPLATE.parent / page
+        if src.exists():
+            shutil.copyfile(src, _WEB_DIR / page)
     out = _WEB_DIR / "index.html"
     out.write_text(html)
     return out
+

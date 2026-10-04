@@ -15,7 +15,15 @@ MODEL_FEATURES = [
 def market_closes(market: pd.DataFrame) -> pd.DataFrame:
     closes = market.pivot_table(index="date", columns="symbol", values="close", aggfunc="last")
     closes.index = pd.to_datetime(closes.index)
-    return closes.sort_index().ffill()
+    closes = closes.sort_index()
+    # BTC trades 7 days a week. Without this filter every weekend becomes a fake 0% day for
+    # stocks, so "20d/60d/250d" windows silently span fewer real sessions. Keep only dates on
+    # which the US equity market actually traded.
+    ref = [c for c in config.AI_COMPLEX + ["SPY"] if c in closes.columns]
+    if ref:
+        traded = closes[ref].notna().sum(axis=1) >= max(1, len(ref) // 2)
+        closes = closes.loc[traded]
+    return closes.ffill()
 
 
 def basket_index(rets: pd.DataFrame, members: list[str]) -> pd.Series:
@@ -57,40 +65,44 @@ def build_feature_frame(market: pd.DataFrame, fred: pd.DataFrame | None) -> pd.D
     if "BTC-USD" in closes.columns:
         feats["btc_mom_30d"] = closes["BTC-USD"].pct_change(30)
 
+    wide = pd.DataFrame()
     if fred is not None and not fred.empty:
         wide = fred.pivot_table(index="date", columns="series", values="value", aggfunc="last")
         wide.index = pd.to_datetime(wide.index)
         wide = wide.sort_index()
-        if "hy_oas" in wide.columns:
-            feats["hy_oas"] = wide["hy_oas"].reindex(feats.index).ffill(limit=5)
-            feats["hy_oas_chg_5d"] = feats["hy_oas"].diff(5)
-        if "vix_cls" in wide.columns:
-            feats["vix_cls"] = wide["vix_cls"].reindex(feats.index).ffill(limit=5)
-            feats["vix_chg_5d"] = feats["vix_cls"].diff(5)
-    if "^TNX" in closes.columns and "vix_cls" not in feats.columns:
+    if "hy_oas" in wide.columns:
+        feats["hy_oas"] = wide["hy_oas"].reindex(feats.index).ffill(limit=5)
+        feats["hy_oas_chg_5d"] = feats["hy_oas"].diff(5)
+    # VIX: Yahoo ^VIX is fresh every day; FRED VIXCLS fills any gaps.
+    vix = closes["^VIX"] if "^VIX" in closes.columns else pd.Series(np.nan, index=feats.index)
+    if "vix_cls" in wide.columns:
+        vix = vix.combine_first(wide["vix_cls"].reindex(feats.index).ffill(limit=5))
+    if vix.notna().any():
+        feats["vix_cls"] = vix
+        feats["vix_chg_5d"] = vix.diff(5)
+    if "^TNX" in closes.columns:
         raw = closes["^TNX"].dropna()
-        scale = 10.0 if float(raw.median()) > 20 else 1.0
-        feats["rate_10y_proxy"] = closes["^TNX"] / scale
+        if not raw.empty:
+            scale = 10.0 if float(raw.median()) > 20 else 1.0
+            feats["rate_10y_proxy"] = closes["^TNX"] / scale
 
     return add_temperature(feats)
 
 
+def _roll_z(frame: pd.DataFrame, col: str, window: int = 250, min_periods: int = 100) -> pd.Series:
+    """How unusual today's value is versus the trailing `window` sessions (incl. today)."""
+    if col not in frame.columns or frame[col].notna().sum() < 30:
+        return pd.Series(np.nan, index=frame.index)
+    s = frame[col]
+    roll = s.rolling(window, min_periods=min_periods)
+    std = roll.std().replace(0.0, np.nan)
+    return (s - roll.mean()) / std
+
+
 def _zscores(frame: pd.DataFrame) -> pd.DataFrame:
     z = pd.DataFrame(index=frame.index)
-
-    def _roll_z(col: str) -> pd.Series:
-        if col not in frame.columns or frame[col].notna().sum() < 30:
-            return pd.Series(np.nan, index=frame.index)
-        return frame[col].rolling(250, min_periods=100).apply(
-            lambda w: (w.iloc[-1] - w.mean()) / (w.std() or np.nan), raw=False
-        )
-
-    z["z_mom_stretch"] = _roll_z("ai_mom_60d")
-    z["z_rs_eqw"] = _roll_z("rs_ai_rsp_60d")
-    z["z_concentration"] = _roll_z("rs_spy_rsp_60d")
-    z["z_credit_tightness"] = -_roll_z("hy_oas")
-    z["z_dd_proximity"] = -_roll_z("ai_drawdown_250d")
-    z["z_btc_risk"] = _roll_z("btc_mom_30d")
+    for g in config.GAUGES:
+        z[g["key"]] = g["sign"] * _roll_z(frame, g["source"])
     return z
 
 
@@ -149,7 +161,7 @@ def classify_regime(snap: dict) -> tuple[str, str]:
 
 def capex_features(capex: pd.DataFrame | None) -> dict:
     out = {"capex_usd_b": None, "capex_yoy_pct": None, "nvda_rev_yoy_pct": None,
-           "nvda_decel_pts": None, "capex_age_days": None}
+           "nvda_decel_pts": None, "capex_age_days": None, "capex_period": None}
     if capex is None or capex.empty:
         return out
     df = capex.sort_values("period").reset_index(drop=True)
@@ -164,15 +176,26 @@ def capex_features(capex: pd.DataFrame | None) -> dict:
         out["nvda_decel_pts"] = round(out["nvda_rev_yoy_pct"] - float(df.iloc[-2]["nvda_rev_yoy_pct"]), 1)
     try:
         year, quarter = latest["period"].split("Q")
-        quarter_end_month = int(quarter) * 3
-        end = pd.Timestamp(int(year), quarter_end_month, 1) + pd.offsets.QuarterEnd(0)
-        out["capex_age_days"] = int((pd.Timestamp.utcnow().normalize() - end.normalize()).days)
+        end = pd.Period(year=int(year), quarter=int(quarter), freq="Q").end_time.normalize()
+        today = pd.Timestamp.now(tz="UTC").tz_localize(None).normalize()
+        out["capex_age_days"] = int((today - end).days)
+        out["capex_period"] = str(latest["period"])
     except Exception:
         pass
     return out
 
 
-def current_snapshot() -> tuple[dict, list[str]]:
+SNAP_COLS = ["ai_mom_20d", "ai_mom_60d", "ai_drawdown_250d", "rs_ai_spx_60d",
+             "rs_ai_rsp_60d", "rs_spy_rsp_60d", "power_mom_60d", "btc_mom_30d",
+             "hy_oas", "hy_oas_chg_5d", "vix_cls", "vix_chg_5d", "rate_10y_proxy",
+             "temperature", "temp_confidence"]
+
+
+def _today_utc() -> pd.Timestamp:
+    return pd.Timestamp.now(tz="UTC").tz_localize(None).normalize()
+
+
+def current_snapshot(frame: pd.DataFrame | None = None) -> tuple[dict, list[str]]:
     market = storage.read_table("market_prices")
     fred = storage.read_table("fred_daily")
     capex = storage.read_table("capex_quarterly")
@@ -180,25 +203,32 @@ def current_snapshot() -> tuple[dict, list[str]]:
     snap: dict = {}
     alerts: list[str] = []
 
-    frame = pd.DataFrame()
-    if market is not None and not market.empty:
+    if frame is None and market is not None and not market.empty:
         frame = build_feature_frame(market, fred)
+    if frame is not None and not frame.empty:
         valid = frame.dropna(subset=["ai_mom_60d"], how="any")
         if not valid.empty:
             last = valid.iloc[-1]
-            for col in ["ai_mom_20d", "ai_mom_60d", "ai_drawdown_250d", "rs_ai_spx_60d",
-                        "rs_ai_rsp_60d", "rs_spy_rsp_60d", "power_mom_60d", "btc_mom_30d",
-                        "hy_oas", "hy_oas_chg_5d", "vix_cls", "vix_chg_5d",
-                        "temperature", "temp_confidence"]:
+            snap["asof"] = valid.index[-1].strftime(config.RUN_DATE_FMT)
+            for col in SNAP_COLS:
                 if col in last.index and pd.notna(last[col]):
                     snap[col] = round(float(last[col]), 4)
-            snap["temperature"] = round(float(last["temperature"]), 1)
-            for gcol in ["z_mom_stretch", "z_rs_eqw", "z_concentration",
-                         "z_credit_tightness", "z_dd_proximity", "z_btc_risk"]:
-                if pd.notna(last[gcol]):
+            if pd.notna(last.get("temperature")):
+                snap["temperature"] = round(float(last["temperature"]), 1)
+                temps = valid["temperature"].dropna()
+                if len(temps) > 5:
+                    snap["temp_chg_5d"] = round(float(temps.iloc[-1] - temps.iloc[-6]), 1)
+            for gcol in config.GAUGE_KEYS:
+                if gcol in last.index and pd.notna(last[gcol]):
                     snap[gcol] = round(float(last[gcol]), 3)
+    if fred is not None and not fred.empty:
+        oas_dates = fred.loc[fred["series"] == "hy_oas", "date"]
+        if not oas_dates.empty:
+            last_oas = pd.Timestamp(oas_dates.max())
+            snap["hy_oas_asof"] = last_oas.strftime(config.RUN_DATE_FMT)
+            snap["hy_oas_age_days"] = int((_today_utc() - last_oas).days)
 
-    snap.update({k: v for k, v in capex_features(capex).items()})
+    snap.update(capex_features(capex))
 
     temp = snap.get("temperature")
     if temp is not None:
@@ -211,6 +241,10 @@ def current_snapshot() -> tuple[dict, list[str]]:
     oas_chg = snap.get("hy_oas_chg_5d")
     if oas_chg is not None and oas_chg >= 0.4:
         alerts.append(f"HY spreads jumped +{oas_chg * 100:.0f}bp in 5 days — credit stress")
+    oas_age = snap.get("hy_oas_age_days")
+    if oas_age is not None and oas_age > config.STALE_DAYS["credit"]:
+        alerts.append(f"Credit-spread data is {oas_age} days old (last FRED print {snap['hy_oas_asof']}) — "
+                      "the credit gauge is excluded from the temperature until it refreshes")
     dd = snap.get("ai_drawdown_250d")
     if dd is not None and dd <= -0.25:
         alerts.append(f"AI complex drawdown {dd:.0%} from highs")
@@ -218,12 +252,13 @@ def current_snapshot() -> tuple[dict, list[str]]:
     if decel is not None and decel <= -15:
         alerts.append(f"NVDA revenue growth decelerated {decel:+.0f}pts QoQ")
     age = snap.get("capex_age_days")
-    if age is not None and age > 200:
-        alerts.append(f"Fundamentals anchor stale ({age}d old) — append new quarter to data/manual/hyperscaler_capex.csv")
+    if age is not None and age > config.STALE_DAYS["fundamentals"]:
+        alerts.append(f"Fundamentals anchor stale (latest quarter {snap.get('capex_period')}, {age}d old) — "
+                      "append new quarters to data/manual/hyperscaler_capex.csv")
     return snap, alerts
 
 
 def build_and_store(snap: dict) -> None:
-    df = pd.DataFrame([{"date": pd.Timestamp.utcnow().strftime(config.RUN_DATE_FMT),
+    df = pd.DataFrame([{"date": _today_utc().strftime(config.RUN_DATE_FMT),
                         **{k: v for k, v in sorted(snap.items())}}])
     storage.write_table(df, "features_daily", ["date"])

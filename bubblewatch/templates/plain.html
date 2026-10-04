@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BubbleWatch · The Plain-English Visual Guide</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+/* Guide-specific styles */
+.hero {
+  padding: 32px 0 16px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 24px;
+}
+.hero h1 {
+  font-size: clamp(26px, 4vw, 36px);
+  line-height: 1.2;
+  margin-bottom: 10px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.hero p {
+  font-size: 16px;
+  color: var(--dim);
+  max-width: 68ch;
+}
+.badge-friendly {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(94, 106, 210, 0.15);
+  color: var(--primary-hover);
+  border: 1px solid rgba(94, 106, 210, 0.3);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* Interactive Simulator */
+.sim-box {
+  background: var(--card);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin: 20px 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+.sim-controls {
+  margin: 20px 0;
+}
+.sim-slider {
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  outline: none;
+  background: linear-gradient(90deg, #38bdf8 0%, #34d399 35%, #fbbf24 65%, #f87171 100%);
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+.sim-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid var(--primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+.sim-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+.band-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.band-btn {
+  background: var(--card-inner);
+  border: 1px solid var(--line);
+  color: var(--dim);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+.band-btn:hover {
+  color: var(--fg);
+  border-color: var(--dim);
+}
+.band-btn.active {
+  background: var(--line);
+  color: var(--fg);
+  border-color: var(--primary);
+  font-weight: 600;
+}
+.sim-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card-inner);
+  border: 1px solid var(--line);
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  margin-top: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.sim-val {
+  font-size: 42px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  line-height: 1;
+}
+
+/* Analogy Cards */
+.gauge-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.gauge-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--line);
+}
+.gauge-card.highlight::before {
+  background: var(--primary);
+}
+.gauge-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.gauge-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--fg);
+}
+.gauge-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+.analogy-quote {
+  background: var(--card-inner);
+  border-left: 3px solid var(--primary);
+  padding: 10px 14px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 13.5px;
+  color: #cdd6e8;
+  font-style: italic;
+  margin: 4px 0;
+}
+
+/* Timeline / Stages */
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+.stage-card {
+  background: var(--card-inner);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.stage-num {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+.stage-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Jargon Buster Grid */
+.jargon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.jargon-item {
+  background: var(--card-inner);
+  border: 1px solid var(--line);
+  padding: 14px 16px;
+  border-radius: var(--radius);
+}
+.jargon-term {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--primary-hover);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.jargon-def {
+  font-size: 13px;
+  color: var(--fg);
+  line-height: 1.5;
+}
+
+/* 30-Second Checklist */
+.checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+.checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  background: var(--card-inner);
+  border: 1px solid var(--line);
+  padding: 12px 16px;
+  border-radius: var(--radius);
+}
+.check-num {
+  background: var(--primary);
+  color: #fff;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="nav">
+  <a href="index.html">← Dashboard</a>
+  <a class="here" href="plain.html">Plain-English Visual Guide <span class="pill-new">Start Here</span></a>
+  <a href="about.html">What is this?</a>
+  <a href="guide.html">Formula & Technical Guide</a>
+  <a href="method.html">Under the Hood</a>
+</nav>
+
+<header class="hero">
+  <div class="badge-friendly">✨ Beginner-Friendly Guide</div>
+  <h1>How to Make Sense of the AI Bubble Dashboard</h1>
+  <p>You don't need a finance degree, a math background, or a statistics textbook to understand what's happening. Here is the entire system explained with simple analogies, interactive visuals, and zero jargon.</p>
+</header>
+
+<!-- Section 1: The Core Concept -->
+<section class="card">
+  <h2>1 · What is an "AI Bubble", in plain words?</h2>
+  <div class="grid-2">
+    <div>
+      <p style="margin-bottom: 12px;">Imagine a popular bakery in town that invents a delicious new croissant. At first, customers love it and happily pay $4.</p>
+      <p style="margin-bottom: 12px;">Then people start saying: <em>"In 5 years, everyone on Earth will eat 10 croissants a day!"</em> Speculators rush in, buying up ovens, flour, butter, and all the croissants they can find. The price of a croissant jumps to $20, then $80, then $250.</p>
+      <p>A <strong>bubble</strong> occurs when stock prices are driven by people rushing to buy because <em>"prices are going up tomorrow"</em>, rather than by how much real cash the companies actually earn. When expectations get impossibly high, even tiny bad news can cause people to head for the exit at once.</p>
+    </div>
+    <div style="background: var(--card-inner); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px;">
+      <h3 style="font-size: 13px; text-transform: uppercase; color: var(--dim); margin-bottom: 10px;">The 3 Rules of Every Tech Cycle</h3>
+      <ul style="padding-left: 20px; font-size: 13.5px; line-height: 1.8; color: var(--fg);">
+        <li><strong>The tech is real:</strong> The Internet was real in 1999; AI is real today. Bubbles don't form around junk; they form around genuine revolutions.</li>
+        <li><strong>The timeline is exaggerated:</strong> Investors expect 15 years of future profits in 12 months.</li>
+        <li><strong>The hardware builds first:</strong> Companies spend hundreds of billions on chips (Nvidia) and data centers before finding out if regular customers will pay enough for the software.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Section 2: Interactive Temperature Simulator -->
+<section class="card">
+  <h2>2 · The Headline: "Bubble Temperature" (0 to 100)</h2>
+  <p>Think of this like an outdoor weather thermometer. When it’s 0°, it’s freezing ice. When it’s 100°, the water is boiling hot. It takes 6 different gauges and combines them into one simple number.</p>
+
+  <div class="sim-box">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size:13px; font-weight:600; color:var(--dim);">INTERACTIVE TEMPERATURE SIMULATOR</span>
+      <span class="dim" style="font-size:12px;">Drag the slider or click a zone below:</span>
+    </div>
+
+    <div class="sim-controls">
+      <input type="range" min="0" max="100" value="58" id="simSlider" class="sim-slider" aria-label="Bubble Temperature Slider">
+      <div class="band-buttons" role="group" aria-label="Temperature Bands">
+        <button class="band-btn" onclick="setSim(15)">🥶 Frost (0–25)</button>
+        <button class="band-btn" onclick="setSim(35)">❄️ Cool (25–45)</button>
+        <button class="band-btn active" onclick="setSim(58)">☀️ Warm (45–60)</button>
+        <button class="band-btn" onclick="setSim(68)">🔥 Hot (60–75)</button>
+        <button class="band-btn" onclick="setSim(88)">🚀 Euphoric (75–100)</button>
+      </div>
+    </div>
+
+    <div class="sim-display">
+      <div>
+        <div class="dim" style="font-size:11.5px; text-transform:uppercase;">Simulated Temperature</div>
+        <div class="sim-val" id="simVal">58<span style="font-size:22px; color:var(--dim); font-weight:400;">/100</span></div>
+      </div>
+      <div>
+        <div class="dim" style="font-size:11.5px; text-transform:uppercase;">Atmosphere & Mood</div>
+        <div id="simMood" style="font-size:16px; font-weight:600; color:var(--up); margin-top:2px;">☀️ Normal, Balanced Market</div>
+      </div>
+      <div style="max-width:380px;">
+        <div class="dim" style="font-size:11.5px; text-transform:uppercase;">What's Happening in Reality?</div>
+        <div id="simDesc" style="font-size:13px; color:var(--fg); margin-top:2px;">Prices are rising with healthy pullbacks. Neither extreme greed nor panic. Investors are paying reasonable attention to earnings.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section 3: The 6 Gauges in Plain English -->
+<section class="card">
+  <h2>3 · The 6 Gauges Explained with Everyday Analogies</h2>
+  <p>Where does the temperature come from? It listens to 6 different "heartbeats" in the financial system. Here is what each one actually listens for:</p>
+
+  <div class="grid">
+    <!-- Gauge 1 -->
+    <div class="gauge-card highlight">
+      <div class="gauge-header">
+        <div>
+          <div class="dim" style="font-size:11px; text-transform:uppercase;">Gauge 1 · Weight 20%</div>
+          <div class="gauge-title">Price Momentum</div>
+        </div>
+        <div class="gauge-icon">🏎️</div>
+      </div>
+      <div class="analogy-quote">"How fast is the car driving down the highway?"</div>
+      <p style="font-size:13px; color:var(--dim);">
+        Normal cruising speed is 65 mph. If AI stocks suddenly surge to 140 mph over a 60-day stretch, they might cover ground quickly, but any tiny obstacle on the road can cause a devastating crash. When momentum stretches way above normal, the gauge gets hot.
+      </p>
+      <div style="font-size:12px; color:var(--fg); background:var(--card-inner); padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--line);">
+        <strong>In the dashboard:</strong> Look at <code>AI complex momentum 60d</code>.
+      </div>
+    </div>
+
+    <!-- Gauge 2 -->
+    <div class="gauge-card highlight">
+      <div class="gauge-header">
+        <div>
+          <div class="dim" style="font-size:11px; text-transform:uppercase;">Gauge 2 · Weight 20%</div>
+          <div class="gauge-title">Credit Complacency</div>
+        </div>
+        <div class="gauge-icon">🐤</div>
+      </div>
+      <div class="analogy-quote">"The canary in the coal mine: Do lenders care about risk?"</div>
+      <p style="font-size:13px; color:var(--dim);">
+        Stock investors can be emotional dreamers, but bond lenders are strict accountants. When bond lenders charge risky companies virtually the same low interest rate as rock-solid governments, nobody is respecting risk. That "complacency" is a classic late-stage bubble warning.
+      </p>
+      <div style="font-size:12px; color:var(--fg); background:var(--card-inner); padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--line);">
+        <strong>In the dashboard:</strong> Look at <code>HY credit spread (OAS)</code>. Lower spread = hotter temperature.
+      </div>
+    </div>
+
+    <!-- Gauge 3 -->
+    <div class="gauge-card highlight">
+      <div class="gauge-header">
+        <div>
+          <div class="dim" style="font-size:11px; text-transform:uppercase;">Gauge 3 · Weight 20%</div>
+          <div class="gauge-title">Closeness to the Peak</div>
+        </div>
+        <div class="gauge-icon">🧗</div>
+      </div>
+      <div class="analogy-quote">"Standing right at the edge of the roof."</div>
+      <p style="font-size:13px; color:var(--dim);">
+        If prices are sitting at their absolute 1-year high (0% drawdown), everyone who bought recently is in profit and feelings of invincibility run rampant. If prices are already down 20% from the peak, the euphoria has already drained away.
+      </p>
+      <div style="font-size:12px; color:var(--fg); background:var(--card-inner); padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--line);">
+        <strong>In the dashboard:</strong> Look at <code>Drawdown from 250d high</code>. 0% = standing right at the peak.
+      </div>
+    </div>
+
+    <!-- Gauge 4 -->
+    <div class="gauge-card">
+      <div class="gauge-header">
+        <div>
+          <div class="dim" style="font-size:11px; text-transform:uppercase;">Gauge 4 · Weight 15%</div>
+          <div class="gauge-title">Crowding into AI</div>
+        </div>
+        <div class="gauge-icon">🚢</div>
+      </div>
+      <div class="analogy-quote">"5,000 passengers all rushing to one side of the boat."</div>
+      <p style="font-size:13px; color:var(--dim);">
+        There are 500 great American companies (S&P 500). If money is only pouring into the 22 AI companies while banks, hospitals, grocery chains, and factories get completely ignored, the boat is tilting. When everyone owns the same trade, who is left to buy?
+      </p>
+      <div style="font-size:12px; color:var(--fg); background:var(--card-inner); padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--line);">
+        <strong>In the dashboard:</strong> Look at <code>AI complex vs equal-weight S&P</code>.
+      </div>
+    </div>
+
+    <!-- Gauge 5 -->
+    <div class="gauge-card">
+      <div class="gauge-header">
+        <div>
+          <div class="dim" style="font-size:11px; text-transform:uppercase;">Gauge 5 · Weight 15%</div>
+          <div class="gauge-title">Market Concentration</div>
+        </div>
+        <div class="gauge-icon">🏀</div>
+      </div>
+      <div class="analogy-quote">"A basketball team where 1 giant player scores every point."</div>
+      <p style="font-size:13px; color:var(--dim);">
+        When a tiny handful of mega-companies (Nvidia, Apple, Microsoft, Alphabet, Amazon) make up 35%+ of the entire stock market, the index isn't diversified anymore. If just one of those giants stumbles on earnings, the entire stock market falls with it.
+      </p>
+      <div style="font-size:12px; color:var(--fg); background:var(--card-inner); padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--line);">
+        <strong>In the dashboard:</strong> Look at <code>Cap-vs-equal-weight spread (concentration)</code>.
+      </div>
+    </div>
+
+    <!-- Gauge 6 -->
+    <div class="gauge-card">
+      <div class="gauge-header">
+        <div>
+          <div class="dim" style="font-size:11px; text-transform:uppercase;">Gauge 6 · Weight 10%</div>
+          <div class="gauge-title">Risk Appetite (Crypto)</div>
+        </div>
+        <div class="gauge-icon">🎰</div>
+      </div>
+      <div class="analogy-quote">"Checking the crowd's gambling mood at the casino."</div>
+      <p style="font-size:13px; color:var(--dim);">
+        Bitcoin doesn't have data centers or earnings reports; it trades on pure animal spirits. When Bitcoin is zooming upward, it tells us that investors have excess cash and are in a fearless, speculative gambling mood.
+      </p>
+      <div style="font-size:12px; color:var(--fg); background:var(--card-inner); padding:8px 12px; border-radius:var(--radius-sm); border:1px solid var(--line);">
+        <strong>In the dashboard:</strong> Look at <code>BTC momentum 30d</code>.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section 4: Regimes Explained -->
+<section class="card">
+  <h2>4 · What Does the "Regime" Mean?</h2>
+  <p>The dashboard translates the numbers into 5 clear states so you don't have to guess:</p>
+
+  <div class="timeline">
+    <div class="stage-card" style="border-top:3px solid var(--up);">
+      <div class="stage-num" style="color:var(--up);">Healthy Growth</div>
+      <div class="stage-title">Expansion</div>
+      <p style="font-size:12.5px; color:var(--dim);">Prices are rising in an orderly trend. No alarming signs of madness or credit stress. Enjoy the ride.</p>
+    </div>
+    <div class="stage-card" style="border-top:3px solid var(--danger);">
+      <div class="stage-num" style="color:var(--danger);">Danger Zone</div>
+      <div class="stage-title">Euphoria</div>
+      <p style="font-size:12.5px; color:var(--dim);">Temperature is above 70. Everyone is talking about riches. Fragile conditions where risk/reward is worst.</p>
+    </div>
+    <div class="stage-card" style="border-top:3px solid var(--warn);">
+      <div class="stage-num" style="color:var(--warn);">The Warning Sign</div>
+      <div class="stage-title">Distribution</div>
+      <p style="font-size:12.5px; color:var(--dim);">Smart institutions quietly sell into the enthusiasm while retail buyers are still eager. Short-term momentum turns down.</p>
+    </div>
+    <div class="stage-card" style="border-top:3px solid #f87171;">
+      <div class="stage-num" style="color:#f87171;">The Slide</div>
+      <div class="stage-title">Contraction</div>
+      <p style="font-size:12.5px; color:var(--dim);">AI stocks drop 25%+ from their peaks. Reality sets in, valuations compress, and latecomers nurse losses.</p>
+    </div>
+    <div class="stage-card" style="border-top:3px solid var(--cold);">
+      <div class="stage-num" style="color:var(--cold);">The Opportunity</div>
+      <div class="stage-title">Capitulation / Recovery</div>
+      <p style="font-size:12.5px; color:var(--dim);">Deep sell-off (>30% drop) where panic exhaust itself and prices start stabilizing. Historically the best entry zone.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Section 5: The Reality Check (Fundamentals) -->
+<section class="card">
+  <h2>5 · The Fundamentals Anchor: Real Cash vs Storytelling</h2>
+  <div class="grid-2">
+    <div>
+      <p style="margin-bottom:12px;">Stock prices can move on rumors and tweets for months, but in the long run, <strong>money is real</strong>.</p>
+      <p style="margin-bottom:12px;">We track two critical numbers every single quarter:</p>
+      <ol style="padding-left:20px; font-size:13.5px; line-height:1.8; color:var(--fg);">
+        <li><strong>Hyperscaler CapEx ($B):</strong> How much cash Microsoft, Google, Amazon, and Meta spend on buying chips, servers, and power each quarter (currently over $160 Billion/quarter!).</li>
+        <li><strong>Nvidia Revenue Growth (% YoY):</strong> How fast the undisputed king of AI hardware is growing its sales compared to last year.</li>
+      </ol>
+      <div class="alert-info" style="margin-top:16px;">
+        💡 <strong>The Golden Warning:</strong> If Big Tech companies keep spending $160B+ every 90 days, but customer demand for AI software fails to generate enough revenue to pay for it, companies will eventually cut their budgets. That moment is when the hardware trade breaks.
+      </div>
+    </div>
+
+    <div style="background:var(--card-inner); border:1px solid var(--line); border-radius:var(--radius); padding:18px;">
+      <h3 style="font-size:13px; text-transform:uppercase; color:var(--dim); margin-bottom:12px;">Latest Reality Check Numbers</h3>
+      <table style="font-size:13px;">
+        <tr>
+          <td style="color:var(--dim);">Combined Tech CapEx</td>
+          <td class="num" style="font-weight:600; color:var(--fg);">$166.6 Billion / quarter</td>
+        </tr>
+        <tr>
+          <td style="color:var(--dim);">CapEx Growth vs Last Year</td>
+          <td class="num" style="font-weight:600; color:var(--up);">+89.3% YoY</td>
+        </tr>
+        <tr>
+          <td style="color:var(--dim);">Nvidia Revenue Growth</td>
+          <td class="num" style="font-weight:600; color:var(--up);">+106% YoY</td>
+        </tr>
+        <tr>
+          <td style="color:var(--dim);">Anchor Period</td>
+          <td class="num" style="color:var(--dim);">2026 Q2</td>
+        </tr>
+      </table>
+      <p style="font-size:12px; color:var(--dim); margin-top:12px;">As long as these cash numbers are roaring upward, the boom has real fuel behind it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Section 6: The 5-Day Prediction & Public Scoreboard -->
+<section class="card">
+  <h2>6 · The 5-Day Prediction & Public Scorecard</h2>
+  <div class="grid-2">
+    <div>
+      <h3 style="font-size:14px; font-weight:600; margin-bottom:8px;">Will AI stocks go up or down over the next 5 days?</h3>
+      <p style="font-size:13.5px; color:var(--dim); margin-bottom:12px;">
+        Every morning, our machine learning model looks at current momentum, interest rates, and bond spreads, and calculates a percentage probability that AI stocks will be higher 5 trading days from now.
+      </p>
+      <p style="font-size:13.5px; color:var(--dim);">
+        Unlike typical Wall Street gurus who hide their bad calls, <strong>every single forecast is written into a permanent public ledger</strong>. Once 5 days pass, the computer grades the prediction:
+      </p>
+      <ul style="padding-left:20px; font-size:13px; line-height:1.7; color:var(--fg); margin-top:8px;">
+        <li><strong>Accuracy:</strong> Did the stock basket actually go up when the model said it would?</li>
+        <li><strong>Brier Score:</strong> A statistical accuracy penalty (golf rules: lower is better). Guessing a flat 50% coin flip gives a Brier score of 0.25. If the model can't beat 0.25, the scoreboard honestly admits it!</li>
+      </ul>
+    </div>
+    <div style="background:var(--card-inner); border:1px solid var(--line); border-radius:var(--radius); padding:18px;">
+      <h3 style="font-size:13px; text-transform:uppercase; color:var(--dim); margin-bottom:10px;">Why We Test Against A Coin Toss</h3>
+      <p style="font-size:13px; color:var(--fg); line-height:1.6; margin-bottom:10px;">
+        Predicting short-term stock movements over 5 days is notoriously difficult because random news happens every day.
+      </p>
+      <p style="font-size:13px; color:var(--fg); line-height:1.6;">
+        By constantly measuring ourselves against a permanent baseline ("what if we just guessed 50/50 every day?"), you can see with your own eyes whether the machine is actually providing an edge or if the market is purely random noise right now.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Section 7: Quick 30-Second Checklist -->
+<section class="card">
+  <h2>7 · How to Read the Dashboard in 30 Seconds</h2>
+  <p>Whenever you visit the dashboard in the morning, just ask yourself these 4 questions:</p>
+  <ul class="checklist">
+    <li>
+      <span class="check-num">1</span>
+      <div>
+        <strong>Check the Temperature:</strong> Is it above 70 (froth danger) or below 25 (deep pessimism)? Between 40 and 65 is normal day-to-day market conditions.
+      </div>
+    </li>
+    <li>
+      <span class="check-num">2</span>
+      <div>
+        <strong>Check the Regime Chip:</strong> Is it in <code>expansion</code> (steady uptrend) or has it shifted to <code>distribution</code> (smart money selling) or <code>euphoria</code> (parabolic melt-up)?
+      </div>
+    </li>
+    <li>
+      <span class="check-num">3</span>
+      <div>
+        <strong>Check for Alerts:</strong> If credit spreads jump or big tech deceleration occurs, a red alert banner will pop up immediately.
+      </div>
+    </li>
+    <li>
+      <span class="check-num">4</span>
+      <div>
+        <strong>Check the Gap in Chart 1:</strong> Look at the gap between the amber line (AI stocks) and the dashed grey line (regular companies). When that gap gets historically wide, crowding is at an extreme.
+      </div>
+    </li>
+  </ul>
+</section>
+
+<!-- Section 8: Jargon Translator -->
+<section class="card">
+  <h2>8 · Jargon Translator (Common Wall Street Terms)</h2>
+  <div class="jargon-grid">
+    <div class="jargon-item">
+      <div class="jargon-term">Z-Score</div>
+      <div class="jargon-def">A measure of how weird today's number is compared to the past year. A z-score of 0 is completely ordinary; +2 is extraordinarily high; -2 is extraordinarily low.</div>
+    </div>
+    <div class="jargon-item">
+      <div class="jargon-term">High-Yield Spread (OAS)</div>
+      <div class="jargon-def">The extra interest percentage that risky companies have to pay compared to the US government. When this is tiny, lenders are being reckless and complacent.</div>
+    </div>
+    <div class="jargon-item">
+      <div class="jargon-term">Drawdown</div>
+      <div class="jargon-def">How far prices have fallen from their peak. 0% means you are at the highest price in history. -20% means you are 20% below the peak.</div>
+    </div>
+    <div class="jargon-item">
+      <div class="jargon-term">Equal-Weight S&P (RSP)</div>
+      <div class="jargon-def">An index where all 500 companies have an equal 0.2% say, showing what the "average" American business is doing without Apple or Nvidia dominating the score.</div>
+    </div>
+    <div class="jargon-item">
+      <div class="jargon-term">Hyperscalers</div>
+      <div class="jargon-def">The mega-cloud providers: Microsoft, Alphabet (Google), Amazon AWS, and Meta. They purchase the vast majority of all AI infrastructure on Earth.</div>
+    </div>
+    <div class="jargon-item">
+      <div class="jargon-term">Rebased to 100</div>
+      <div class="jargon-def">Starting all stock charts at the exact same starting line ($100) so you can easily see which one gained more ground over time.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  BubbleWatch · Educational research project · Not financial or investment advice · 
+  <a href="index.html">Back to Dashboard</a> · 
+  <a href="guide.html">View Mathematical Formulas</a>
+</footer>
+
+</div>
+
+<script>
+const simSlider = document.getElementById("simSlider");
+const simVal = document.getElementById("simVal");
+const simMood = document.getElementById("simMood");
+const simDesc = document.getElementById("simDesc");
+const buttons = document.querySelectorAll(".band-btn");
+
+const states = [
+  { max: 25, label: "frost", mood: "🥶 Extreme Pessimism & Fear", color: "#60a5fa",
+    desc: "AI is widely declared dead or a failure. Stocks have suffered steep losses. Valuation is depressed. Historically, this is where patient, long-term investors find deep bargains." },
+  { max: 45, label: "cool", mood: "❄️ Cool & Skeptical", color: "#93c5fd",
+    desc: "Investors are skeptical and cautious. Companies must prove their earnings. Growth is steady without speculative froth." },
+  { max: 60, label: "warm", mood: "☀️ Normal, Balanced Market", color: "#34d399",
+    desc: "Healthy day-to-day conditions. Prices rise with periodic pullbacks. Neither extreme greed nor panic is driving the tape." },
+  { max: 75, label: "hot", mood: "🔥 Elevated Froth & Hype", color: "#fbbf24",
+    desc: "The hype train is in full swing. Easy money talk everywhere. Valuations are stretched and market concentration is high. Time to tighten your seatbelt." },
+  { max: 100, label: "euphoric", mood: "🚀 Euphoric Mania (Melt-Up)", color: "#f87171",
+    desc: "Extreme greed. Speculators believe prices can never fall. Lenders charge almost no risk premium. Maximum fragility: the smallest pin can burst the balloon." }
+];
+
+function updateSim(val) {
+  simSlider.value = val;
+  simVal.innerHTML = Math.round(val) + '<span style="font-size:22px; color:var(--dim); font-weight:400;">/100</span>';
+  const state = states.find(s => val <= s.max) || states[states.length - 1];
+  simMood.textContent = state.mood;
+  simMood.style.color = state.color;
+  simDesc.textContent = state.desc;
+
+  buttons.forEach(btn => {
+    btn.classList.toggle("active", btn.textContent.toLowerCase().includes(state.label));
+  });
+}
+
+function setSim(val) {
+  updateSim(val);
+}
+
+simSlider.addEventListener("input", (e) => {
+  updateSim(Number(e.target.value));
+});
+</script>
+</body>
+</html>

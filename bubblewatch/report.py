@@ -7,7 +7,9 @@ import pandas as pd
 from . import config
 
 FEATURE_LABELS = [
+    ("asof", "Market data as-of"),
     ("temperature", "Bubble temperature (0-100)"),
+    ("temp_chg_5d", "Temperature change vs 1wk ago (pts)"),
     ("temp_confidence", "Gauge coverage"),
     ("ai_mom_20d", "AI complex momentum 20d"),
     ("ai_mom_60d", "AI complex momentum 60d"),
@@ -19,13 +21,15 @@ FEATURE_LABELS = [
     ("btc_mom_30d", "BTC momentum 30d (risk appetite)"),
     ("hy_oas", "US HY credit spread OAS (%)"),
     ("hy_oas_chg_5d", "HY spread change 5d (pts)"),
+    ("hy_oas_asof", "Credit spread data as-of"),
     ("vix_cls", "VIX close"),
     ("rate_10y_proxy", "US 10Y yield proxy (%)"),
     ("capex_usd_b", "Hyperscaler capex, latest qtr ($B)"),
     ("capex_yoy_pct", "Hyperscaler capex YoY (%)"),
     ("nvda_rev_yoy_pct", "NVDA revenue YoY (%)"),
     ("nvda_decel_pts", "NVDA YoY deceleration QoQ (pts)"),
-    ("capex_age_days", "Days since fundamentals anchor quarter-end"),
+    ("capex_period", "Fundamentals anchor quarter"),
+    ("capex_age_days", "Days since fundamentals quarter-end"),
 ]
 
 
