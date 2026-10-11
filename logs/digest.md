@@ -1,4 +1,4 @@
-# BubbleWatch Daily Digest — 2026-10-10 06:46 UTC
+# BubbleWatch Daily Digest — 2026-10-11 06:54 UTC
 
 ## Verdict
 - **Bubble temperature:** **61/100** (hot) — gauge coverage 100%
@@ -30,7 +30,7 @@
 | NVDA revenue YoY (%) | 106.00 |
 | NVDA YoY deceleration QoQ (pts) | 21.00 |
 | Fundamentals anchor quarter | 2026Q2 |
-| Days since fundamentals quarter-end | 102 |
+| Days since fundamentals quarter-end | 103 |
 
 ## Today's predictions (logged to ledger)
 | Target | Horizon | Model P(up) | Constant baseline | Note |
@@ -40,8 +40,8 @@
 ## Source status (this run)
 | Source | Status | Rows | Detail |
 |---|---|---|---|
-| equities | ok | 24721 | total=25858 new_days=1 src=yfinance |
-| fred | ok | 24 | total=1443 latest={'hy_oas': '2026-10-08', 'vix_cls': '2026-10-08'} |
+| equities | ok | 24721 | total=25859 new_days=1 src=yfinance |
+| fred | ok | 22 | total=1443 latest={'hy_oas': '2026-10-08', 'vix_cls': '2026-10-08'} |
 | capex | ok | 10 | total=10 latest_period=2026Q2 |
 
 ## Prediction scoreboard (vs baselines)
