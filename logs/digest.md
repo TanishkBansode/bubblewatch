@@ -1,54 +1,54 @@
-# BubbleWatch Daily Digest — 2026-10-15 05:39 UTC
+# BubbleWatch Daily Digest — 2026-10-16 05:35 UTC
 
 ## Verdict
-- **Bubble temperature:** **48/100** (warm) — gauge coverage 100%
-- **Regime:** `expansion` — uptrend intact without froth extremes
-- **Model** P(AI complex up next 5d): **57%** (test Brier 0.2912 vs majority acc 0.548, asof 2026-10-14)
+- **Bubble temperature:** **44/100** (cool) — gauge coverage 100%
+- **Regime:** `distribution` — short-term momentum rolled over while still above deep-bear zone
+- **Model** P(AI complex up next 5d): **51%** (test Brier 0.2906 vs majority acc 0.548, asof 2026-10-15)
 
 ## Key indicators
 | Indicator | Value |
 |---|---|
-| Market data as-of | 2026-10-14 |
-| Bubble temperature (0-100) | 48.00 |
-| Temperature change vs 1wk ago (pts) | -14.60 |
+| Market data as-of | 2026-10-15 |
+| Bubble temperature (0-100) | 44.00 |
+| Temperature change vs 1wk ago (pts) | -11.00 |
 | Gauge coverage | 1.00 |
-| AI complex momentum 20d | 0.02 |
+| AI complex momentum 20d | -0.00 |
 | AI complex momentum 60d | 0.11 |
 | Drawdown from 250d high | -0.06 |
-| AI complex vs SPY 60d excess | 0.09 |
-| AI complex vs equal-weight S&P 60d | 0.12 |
-| Cap-vs-equal-weight spread 60d (concentration) | 0.03 |
-| Power/utilities theme momentum 60d | -0.03 |
-| BTC momentum 30d (risk appetite) | 0.08 |
-| US HY credit spread OAS (%) | 3.16 |
-| HY spread change 5d (pts) | 0.07 |
-| Credit spread data as-of | 2026-10-13 |
-| VIX close | 16.87 |
-| US 10Y yield proxy (%) | 5.19 |
+| AI complex vs SPY 60d excess | 0.08 |
+| AI complex vs equal-weight S&P 60d | 0.10 |
+| Cap-vs-equal-weight spread 60d (concentration) | 0.02 |
+| Power/utilities theme momentum 60d | -0.06 |
+| BTC momentum 30d (risk appetite) | 0.05 |
+| US HY credit spread OAS (%) | 3.25 |
+| HY spread change 5d (pts) | 0.10 |
+| Credit spread data as-of | 2026-10-14 |
+| VIX close | 16.46 |
+| US 10Y yield proxy (%) | 5.09 |
 | Hyperscaler capex, latest qtr ($B) | 166.60 |
 | Hyperscaler capex YoY (%) | 89.30 |
 | NVDA revenue YoY (%) | 106.00 |
 | NVDA YoY deceleration QoQ (pts) | 21.00 |
 | Fundamentals anchor quarter | 2026Q2 |
-| Days since fundamentals quarter-end | 107 |
+| Days since fundamentals quarter-end | 108 |
 
 ## Today's predictions (logged to ledger)
 | Target | Horizon | Model P(up) | Constant baseline | Note |
 |---|---|---|---|---|
-| AI_complex_dir_5d | 5d | 0.57 | 0.50 | logistic on equity+credit features; scored vs constant baseline |
+| AI_complex_dir_5d | 5d | 0.51 | 0.50 | logistic on equity+credit features; scored vs constant baseline |
 
 ## Source status (this run)
 | Source | Status | Rows | Detail |
 |---|---|---|---|
-| equities | ok | 24721 | total=25959 new_days=1 src=yfinance |
-| fred | ok | 24 | total=1449 latest={'hy_oas': '2026-10-13', 'vix_cls': '2026-10-13'} |
+| equities | ok | 24721 | total=25992 new_days=1 src=yfinance |
+| fred | ok | 24 | total=1451 latest={'hy_oas': '2026-10-14', 'vix_cls': '2026-10-14'} |
 | capex | ok | 10 | total=10 latest_period=2026Q2 |
 
 ## Prediction scoreboard (vs baselines)
 | target            | model      |   n |   brier |   accuracy |
 |:------------------|:-----------|----:|--------:|-----------:|
-| AI_complex_dir_5d | p_model    |  53 |  0.2837 |      0.377 |
-| AI_complex_dir_5d | p_constant |  53 |  0.25   |      0.377 |
+| AI_complex_dir_5d | p_model    |  54 |  0.2832 |      0.37  |
+| AI_complex_dir_5d | p_constant |  54 |  0.25   |      0.389 |
 
 ---
 *Temperature = weighted z-composite; formula and weights published on the site. Baselines are permanent. Not investment advice.*
