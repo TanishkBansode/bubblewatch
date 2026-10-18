@@ -1,4 +1,4 @@
-# BubbleWatch Daily Digest — 2026-10-17 05:23 UTC
+# BubbleWatch Daily Digest — 2026-10-18 05:30 UTC
 
 ## Verdict
 - **Bubble temperature:** **38/100** (cool) — gauge coverage 100%
@@ -9,8 +9,8 @@
 | Indicator | Value |
 |---|---|
 | Market data as-of | 2026-10-16 |
-| Bubble temperature (0-100) | 37.60 |
-| Temperature change vs 1wk ago (pts) | -24.40 |
+| Bubble temperature (0-100) | 37.50 |
+| Temperature change vs 1wk ago (pts) | -24.50 |
 | Gauge coverage | 1.00 |
 | AI complex momentum 20d | -0.04 |
 | AI complex momentum 60d | 0.09 |
@@ -19,7 +19,7 @@
 | AI complex vs equal-weight S&P 60d | 0.08 |
 | Cap-vs-equal-weight spread 60d (concentration) | 0.02 |
 | Power/utilities theme momentum 60d | -0.07 |
-| BTC momentum 30d (risk appetite) | 0.01 |
+| BTC momentum 30d (risk appetite) | 0.00 |
 | US HY credit spread OAS (%) | 3.23 |
 | HY spread change 5d (pts) | 0.12 |
 | Credit spread data as-of | 2026-10-15 |
@@ -30,7 +30,7 @@
 | NVDA revenue YoY (%) | 106.00 |
 | NVDA YoY deceleration QoQ (pts) | 21.00 |
 | Fundamentals anchor quarter | 2026Q2 |
-| Days since fundamentals quarter-end | 109 |
+| Days since fundamentals quarter-end | 110 |
 
 ## Today's predictions (logged to ledger)
 | Target | Horizon | Model P(up) | Constant baseline | Note |
@@ -40,8 +40,8 @@
 ## Source status (this run)
 | Source | Status | Rows | Detail |
 |---|---|---|---|
-| equities | ok | 24721 | total=26025 new_days=1 src=yfinance |
-| fred | ok | 24 | total=1453 latest={'hy_oas': '2026-10-15', 'vix_cls': '2026-10-15'} |
+| equities | ok | 24721 | total=26026 new_days=1 src=yfinance |
+| fred | ok | 22 | total=1453 latest={'hy_oas': '2026-10-15', 'vix_cls': '2026-10-15'} |
 | capex | ok | 10 | total=10 latest_period=2026Q2 |
 
 ## Prediction scoreboard (vs baselines)
