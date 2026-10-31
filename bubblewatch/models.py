@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import json
-
+from typing import Any
 import numpy as np
 import pandas as pd
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
 from . import config, storage
 from .features import MODEL_FEATURES, basket_index, build_feature_frame, market_closes
@@ -16,28 +19,93 @@ def _ai_index(closes: pd.DataFrame) -> pd.Series:
     return basket_index(rets, config.AI_COMPLEX)
 
 
-def make_supervised(feats: pd.DataFrame, idx: pd.Series, x_cols: list[str] | None = None) -> pd.DataFrame:
+def brier_decomposition(y_true: np.ndarray, y_prob: np.ndarray, n_bins: int = 5) -> dict[str, float]:
+    """
+    Murphy (1973) Brier score calibration decomposition on binned probabilistic forecasts:
+      Brier = Reliability - Resolution + Uncertainty
+    where:
+      Uncertainty = y_bar * (1 - y_bar) (intrinsic unpredictability of the event)
+      Reliability = sum(n_k * (p_k - y_k)^2) / N (calibration error; 0 is perfect)
+      Resolution  = sum(n_k * (y_k - y_bar)^2) / N (ability to discriminate outcomes; higher is better)
+    """
+    y = np.asarray(y_true, dtype=float)
+    p = np.clip(np.asarray(y_prob, dtype=float), 1e-6, 1.0 - 1e-6)
+    n = len(y)
+    if n == 0:
+        return {"brier": 0.0, "uncertainty": 0.0, "reliability": 0.0, "resolution": 0.0}
+
+    y_bar = float(y.mean())
+    unc = y_bar * (1.0 - y_bar)
+
+    bin_edges = np.linspace(0.0, 1.0, n_bins + 1)
+    bin_idx = np.digitize(p, bin_edges) - 1
+    bin_idx = np.clip(bin_idx, 0, n_bins - 1)
+
+    rel = 0.0
+    res = 0.0
+    for k in range(n_bins):
+        mask = (bin_idx == k)
+        nk = np.sum(mask)
+        if nk > 0:
+            pk = float(p[mask].mean())
+            yk = float(y[mask].mean())
+            rel += nk * ((pk - yk) ** 2)
+            res += nk * ((yk - y_bar) ** 2)
+    rel /= n
+    res /= n
+    brier = float(np.mean((p - y) ** 2))
+
+    return {
+        "brier": round(brier, 4),
+        "uncertainty": round(unc, 4),
+        "reliability": round(rel, 4),
+        "resolution": round(res, 4),
+    }
+
+
+def make_supervised(
+    feats: pd.DataFrame,
+    idx: pd.Series,
+    horizon_days: int = HORIZON_DAYS,
+    x_cols: list[str] | None = None,
+    is_tail_risk: bool = False,
+    tail_threshold: float = -0.05,
+) -> pd.DataFrame:
+    """Build supervised training frame with clean forward targets."""
     df = feats.copy()
-    fwd = idx.reindex(df.index).shift(-HORIZON_DAYS) / idx.reindex(df.index) - 1.0
-    # NaN-safe: (NaN > 0) is False, which used to label the most recent rows as "down".
-    df["target_up"] = (fwd > 0).astype(float).where(fwd.notna())
+    fwd = idx.reindex(df.index).shift(-horizon_days) / idx.reindex(df.index) - 1.0
+
+    if is_tail_risk:
+        # 1 if drawdown meets or breaches threshold, 0 otherwise
+        df["target"] = (fwd <= tail_threshold).astype(float).where(fwd.notna())
+    else:
+        # 1 if positive return, 0 otherwise
+        df["target"] = (fwd > 0.0).astype(float).where(fwd.notna())
+
     cols = x_cols if x_cols is not None else [c for c in MODEL_FEATURES if c in df.columns]
+    # Forward-fill any minor missing indicator up to 5 days, then median-impute to stabilize feature matrix
+    for col in cols:
+        if col in df.columns:
+            df[col] = df[col].ffill(limit=5)
+            med = df[col].median()
+            df[col] = df[col].fillna(med if pd.notna(med) else 0.0)
+
     df = df.dropna(subset=cols)
-    df = df.dropna(subset=["target_up"])
+    df = df.dropna(subset=["target"])
     return df
 
 
-def _skill_label(model_brier: float, const_brier: float, n: int) -> str:
+def _skill_label(model_brier: float, benchmark_brier: float, n: int) -> str:
     if n < 30:
         return "too_early"
-    if model_brier < const_brier - 0.005:
+    if model_brier < benchmark_brier - 0.005:
         return "edge"
-    if model_brier > const_brier + 0.005:
+    if model_brier > benchmark_brier + 0.005:
         return "worse"
-    return "none"
+    return "neutral"
 
 
-def train_direction_model() -> dict:
+def train_direction_model() -> dict[str, Any]:
     market = storage.read_table("market_prices")
     fred = storage.read_table("fred_daily")
     if market is None or market.empty:
@@ -49,66 +117,151 @@ def train_direction_model() -> dict:
     if feats.empty:
         return {"status": "no_data"}
 
-    # Only use features that exist on the latest row, so the forecast is about *today*.
-    latest_row = feats.iloc[-1]
-    x_cols = [c for c in MODEL_FEATURES if c in feats.columns and pd.notna(latest_row.get(c))]
-    dropped = [c for c in MODEL_FEATURES if c not in x_cols]
-    data = make_supervised(feats, idx, x_cols)
+    # Use available features with stable fallback
+    x_cols = [c for c in MODEL_FEATURES if c in feats.columns]
+    data = make_supervised(feats, idx, horizon_days=HORIZON_DAYS, x_cols=x_cols)
     if len(data) < 120 or not x_cols:
         return {"status": "insufficient_history", "rows": len(data)}
 
-    split = int(len(data) * 0.8)
-    X_train, y_train = data[x_cols].iloc[:split], data["target_up"].iloc[:split]
-    X_test, y_test = data[x_cols].iloc[split:], data["target_up"].iloc[split:]
+    # Purged Chronological Train/Test Split
+    split = int(len(data) * 0.80)
+    purge_gap = HORIZON_DAYS  # Purge training rows whose forward target spans into test window
+    train_end = max(10, split - purge_gap)
 
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.pipeline import make_pipeline
-    from sklearn.preprocessing import StandardScaler
+    X_train = data[x_cols].iloc[:train_end]
+    y_train = data["target"].iloc[:train_end]
 
-    model = make_pipeline(StandardScaler(), LogisticRegression(C=0.5, max_iter=1000))
+    X_test = data[x_cols].iloc[split:]
+    y_test = data["target"].iloc[split:]
+
+    # Regularized L2 pipeline with feature standard scaling
+    model = make_pipeline(StandardScaler(), LogisticRegression(C=0.15, max_iter=1000))
     model.fit(X_train, y_train)
 
-    result = {"status": "ok", "train_rows": int(split), "test_rows": int(len(y_test)),
-              "features_used": x_cols, "features_dropped": dropped}
+    train_base_rate = float(y_train.mean())
+    result: dict[str, Any] = {
+        "status": "ok",
+        "train_rows": int(len(X_train)),
+        "test_rows": int(len(y_test)),
+        "purged_rows": int(purge_gap),
+        "features_used": x_cols,
+        "features_dropped": [c for c in MODEL_FEATURES if c not in x_cols],
+        "train_base_rate": round(train_base_rate, 3),
+    }
+
     if len(y_test) > 20:
         y = y_test.to_numpy()
         proba = model.predict_proba(X_test)[:, 1]
         brier = float(np.mean((proba - y) ** 2))
-        const_brier = float(np.mean((0.5 - y) ** 2))
+        base_rate_brier = float(np.mean((train_base_rate - y) ** 2))
+        coinflip_brier = float(np.mean((0.5 - y) ** 2))
         acc = float(((proba > 0.5).astype(float) == y).mean())
-        base = float(max(y.mean(), 1 - y.mean()))
-        result.update({"brier": round(brier, 4),
-                       "constant_brier": round(const_brier, 4),
-                       "accuracy": round(acc, 3),
-                       "majority_baseline_acc": round(base, 3),
-                       "base_rate_up": round(float(y.mean()), 3),
-                       "skill": _skill_label(brier, const_brier, len(y))})
-    latest = feats[x_cols].iloc[[-1]]
-    p_up = float(model.predict_proba(latest)[0, 1])
-    result["p_ai_up_5d"] = round(p_up, 3)
+        majority_acc = float(max(y.mean(), 1.0 - y.mean()))
+
+        decomp = brier_decomposition(y, proba)
+
+        result.update(
+            {
+                "brier": round(brier, 4),
+                "base_rate_brier": round(base_rate_brier, 4),
+                "constant_brier": round(coinflip_brier, 4),
+                "brier_uncertainty": decomp["uncertainty"],
+                "brier_reliability": decomp["reliability"],
+                "brier_resolution": decomp["resolution"],
+                "accuracy": round(acc, 3),
+                "majority_baseline_acc": round(majority_acc, 3),
+                "test_base_rate_up": round(float(y.mean()), 3),
+                "skill": _skill_label(brier, base_rate_brier, len(y)),
+                "skill_vs_coinflip": _skill_label(brier, coinflip_brier, len(y)),
+            }
+        )
+
+    # Refit full historical sample for current live prediction
+    full_model = make_pipeline(StandardScaler(), LogisticRegression(C=0.15, max_iter=1000))
+    full_model.fit(data[x_cols], data["target"])
+
+    latest = feats[x_cols].iloc[[-1]].copy()
+    for col in x_cols:
+        if latest[col].isna().any():
+            latest[col] = latest[col].fillna(data[col].median())
+
+    p_up_5d = float(full_model.predict_proba(latest)[0, 1])
+    result["p_ai_up_5d"] = round(p_up_5d, 3)
+
+    # Train 21-day directional model
+    data_21d = make_supervised(feats, idx, horizon_days=21, x_cols=x_cols)
+    if len(data_21d) >= 120:
+        m21 = make_pipeline(StandardScaler(), LogisticRegression(C=0.15, max_iter=1000))
+        m21.fit(data_21d[x_cols], data_21d["target"])
+        result["p_ai_up_21d"] = round(float(m21.predict_proba(latest)[0, 1]), 3)
+
+    # Train 21-day tail risk model (drawdown <= -5%)
+    data_tail21 = make_supervised(feats, idx, horizon_days=21, x_cols=x_cols, is_tail_risk=True, tail_threshold=-0.05)
+    if len(data_tail21) >= 120:
+        mtail21 = make_pipeline(StandardScaler(), LogisticRegression(C=0.15, max_iter=1000))
+        mtail21.fit(data_tail21[x_cols], data_tail21["target"])
+        result["p_tail_down_5pct_21d"] = round(float(mtail21.predict_proba(latest)[0, 1]), 3)
+
     result["asof"] = str(feats.index[-1].date())
     result["trained_to"] = str(data.index[-1].date())
     return result
 
 
-def direction_predictions(proxy: dict) -> list[dict]:
+def direction_predictions(proxy: dict[str, Any]) -> list[dict[str, Any]]:
     ok = proxy.get("status") == "ok"
-    p = proxy.get("p_ai_up_5d") if ok else None
-    return [
+    p5 = proxy.get("p_ai_up_5d") if ok else None
+    p21 = proxy.get("p_ai_up_21d") if ok else None
+    ptail21 = proxy.get("p_tail_down_5pct_21d") if ok else None
+    base5 = proxy.get("train_base_rate", 0.59)
+
+    preds: list[dict[str, Any]] = [
         {
             "target": "AI_complex_dir_5d",
-            "horizon_days": HORIZON_DAYS,
+            "horizon_days": 5,
             "horizon_unit": "trading_days",
             "asof": proxy.get("asof") if ok else None,
-            "p_model": p,
+            "p_model": p5,
             "p_constant": 0.5,
-            "note": "logistic on equity+credit features; scored vs constant baseline",
+            "p_base_rate": base5,
+            "note": "regularized logistic on equity+credit+breadth; purged train/test",
         }
     ]
 
+    if p21 is not None:
+        preds.append(
+            {
+                "target": "AI_complex_dir_21d",
+                "horizon_days": 21,
+                "horizon_unit": "trading_days",
+                "asof": proxy.get("asof") if ok else None,
+                "p_model": p21,
+                "p_constant": 0.5,
+                "note": "21-trading-day direction forecast (~1 month)",
+            }
+        )
 
-def append_run_to_ledger(snap: dict, regime: tuple[str, str], proxy: dict,
-                         preds: list[dict]) -> None:
+    if ptail21 is not None:
+        preds.append(
+            {
+                "target": "AI_complex_tail_21d",
+                "horizon_days": 21,
+                "horizon_unit": "trading_days",
+                "asof": proxy.get("asof") if ok else None,
+                "p_model": ptail21,
+                "p_constant": 0.15,
+                "note": "21-trading-day tail risk hazard: P(return <= -5%)",
+            }
+        )
+
+    return preds
+
+
+def append_run_to_ledger(
+    snap: dict[str, Any],
+    regime: tuple[str, str],
+    proxy: dict[str, Any],
+    preds: list[dict[str, Any]],
+) -> None:
     from .storage import append_ledger, features_hash
 
     record = {
@@ -157,22 +310,32 @@ def evaluate_ledger() -> pd.DataFrame:
         for pred in rec.get("predictions", []):
             h = int(pred.get("horizon_days", HORIZON_DAYS))
             unit = pred.get("horizon_unit", "calendar_days")
+            target = pred.get("target", "AI_complex_dir_5d")
             outcome = None
+
             if "trading" in str(unit):
                 target_pos = base_pos + h
                 if target_pos < len(dates):
-                    outcome = 1.0 if idx.iloc[target_pos] / idx.iloc[base_pos] - 1.0 > 0 else 0.0
+                    ret = idx.iloc[target_pos] / idx.iloc[base_pos] - 1.0
+                    if "tail" in target:
+                        outcome = 1.0 if ret <= -0.05 else 0.0
+                    else:
+                        outcome = 1.0 if ret > 0.0 else 0.0
             else:
                 due = run_d + pd.Timedelta(days=h)
                 future_dates = [d for d in dates if d >= due]
                 if future_dates:
                     target_d = future_dates[0]
-                    outcome = 1.0 if idx.loc[target_d] / idx.loc[base_d] - 1.0 > 0 else 0.0
+                    ret = idx.loc[target_d] / idx.loc[base_d] - 1.0
+                    if "tail" in target:
+                        outcome = 1.0 if ret <= -0.05 else 0.0
+                    else:
+                        outcome = 1.0 if ret > 0.0 else 0.0
 
             if outcome is not None:
                 rows.append({
                     "run_date": rec["run_date"],
-                    "target": pred.get("target", "AI_complex_dir_5d"),
+                    "target": target,
                     "p_model": pred.get("p_model"),
                     "p_constant": pred.get("p_constant", 0.5),
                     "outcome": outcome,
@@ -201,4 +364,3 @@ def evaluate_ledger() -> pd.DataFrame:
                 "accuracy": round(acc, 3),
             })
     return pd.DataFrame(summary)
-

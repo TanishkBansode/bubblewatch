@@ -5,5 +5,8 @@ requests
 beautifulsoup4
 lxml
 scikit-learn
+scipy
 yfinance
 tabulate
+hmmlearn
+lppls

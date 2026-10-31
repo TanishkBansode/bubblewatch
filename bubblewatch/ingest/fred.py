@@ -11,6 +11,7 @@ from .. import config, storage
 def _fetch_series(series_id: str, start_date: str = config.FRED_START) -> pd.DataFrame:
     import shutil
     import subprocess
+    import time
     import urllib.request
     from io import StringIO
 
@@ -18,36 +19,55 @@ def _fetch_series(series_id: str, start_date: str = config.FRED_START) -> pd.Dat
         "https://fred.stlouisfed.org/graph/fredgraph.csv"
         f"?id={series_id}&cosd={start_date}"
     )
-    text = None
-    if shutil.which("curl"):
+
+    last_error = None
+    max_retries = getattr(config, "FRED_RETRIES", 3)
+
+    for attempt in range(max_retries):
+        text = None
         try:
-            res = subprocess.run(
-                ["curl", "-s", "-f", "-m", "15", url],
-                capture_output=True,
-                text=True,
-                timeout=18,
-            )
-            if res.returncode == 0 and res.stdout.strip():
-                text = res.stdout
-        except Exception:
-            text = None
+            if shutil.which("curl"):
+                try:
+                    res = subprocess.run(
+                        ["curl", "-s", "-f", "-m", "15", url],
+                        capture_output=True,
+                        text=True,
+                        timeout=18,
+                    )
+                    if res.returncode == 0 and res.stdout.strip():
+                        text = res.stdout
+                except Exception as e:
+                    last_error = e
+                    text = None
 
-    if text is None:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)"
-        }
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            text = resp.read().decode("utf-8")
+            if text is None:
+                headers = {
+                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)"
+                }
+                req = urllib.request.Request(url, headers=headers)
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    text = resp.read().decode("utf-8")
 
-    df = pd.read_csv(StringIO(text))
-    cols = list(df.columns)
-    date_col = cols[0]
-    value_col = [c for c in cols if c != date_col][0]
-    df = df.rename(columns={date_col: "date", value_col: "value"})
-    df["value"] = pd.to_numeric(df["value"], errors="coerce")
-    df = df.dropna(subset=["value"])
-    return df
+            if text and ("<html" not in text.lower() and "<!doctype" not in text.lower()):
+                df = pd.read_csv(StringIO(text))
+                cols = list(df.columns)
+                if len(cols) >= 2:
+                    date_col = cols[0]
+                    value_col = cols[1]
+                    df = df.rename(columns={date_col: "date", value_col: "value"})
+                    df["value"] = pd.to_numeric(df["value"], errors="coerce")
+                    df = df.dropna(subset=["value"])
+                    if not df.empty:
+                        return df
+        except Exception as exc:
+            last_error = exc
+
+        if attempt < max_retries - 1:
+            time.sleep(1.5 * (attempt + 1))
+
+    if last_error:
+        raise last_error
+    return pd.DataFrame(columns=["date", "value"])
 
 
 def run() -> int:

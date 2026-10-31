@@ -9,6 +9,7 @@ MODEL_FEATURES = [
     "ai_mom_20d", "ai_mom_60d", "ai_drawdown_250d",
     "rs_ai_spx_60d", "rs_ai_rsp_60d", "rs_spy_rsp_60d",
     "power_mom_60d", "btc_mom_30d", "hy_oas_chg_5d", "vix_chg_5d",
+    "ai_breadth_20d", "ai_dispersion_20d",
 ]
 
 
@@ -53,6 +54,13 @@ def build_feature_frame(market: pd.DataFrame, fred: pd.DataFrame | None) -> pd.D
     roll_max = ai_idx.rolling(250, min_periods=60).max()
     feats["ai_drawdown_250d"] = ai_idx / roll_max - 1.0
 
+    # Market Breadth & Cross-Sectional Dispersion within AI Complex
+    if ai_cols:
+        ai_20d_pct = closes[ai_cols].pct_change(20)
+        valid_counts = closes[ai_cols].notna().sum(axis=1)
+        feats["ai_breadth_20d"] = (ai_20d_pct > 0).sum(axis=1) / valid_counts.where(valid_counts > 0)
+        feats["ai_dispersion_20d"] = ai_20d_pct.std(axis=1)
+
     if "SPY" in rets.columns:
         feats["rs_ai_spx_60d"] = ai_ret_mean.rolling(60, min_periods=40).sum() - _sum60("SPY")
     if "RSP" in rets.columns:
@@ -73,6 +81,11 @@ def build_feature_frame(market: pd.DataFrame, fred: pd.DataFrame | None) -> pd.D
     if "hy_oas" in wide.columns:
         feats["hy_oas"] = wide["hy_oas"].reindex(feats.index).ffill(limit=5)
         feats["hy_oas_chg_5d"] = feats["hy_oas"].diff(5)
+    if "real_yield_10y" in wide.columns:
+        feats["real_yield_10y"] = wide["real_yield_10y"].reindex(feats.index).ffill(limit=5)
+        feats["real_yield_chg_20d"] = feats["real_yield_10y"].diff(20)
+    if "yield_curve_10y2y" in wide.columns:
+        feats["yield_curve_10y2y"] = wide["yield_curve_10y2y"].reindex(feats.index).ffill(limit=5)
     # VIX: Yahoo ^VIX is fresh every day; FRED VIXCLS fills any gaps.
     vix = closes["^VIX"] if "^VIX" in closes.columns else pd.Series(np.nan, index=feats.index)
     if "vix_cls" in wide.columns:
@@ -80,6 +93,10 @@ def build_feature_frame(market: pd.DataFrame, fred: pd.DataFrame | None) -> pd.D
     if vix.notna().any():
         feats["vix_cls"] = vix
         feats["vix_chg_5d"] = vix.diff(5)
+    if "VX=F" in closes.columns and "^VIX" in closes.columns:
+        vx = closes["VX=F"].dropna()
+        if not vx.empty:
+            feats["vix_contango"] = (closes["VX=F"] / closes["^VIX"] - 1.0)
     if "^TNX" in closes.columns:
         raw = closes["^TNX"].dropna()
         if not raw.empty:
@@ -144,14 +161,20 @@ def classify_regime(snap: dict) -> tuple[str, str]:
     m20 = snap.get("ai_mom_20d")
     m60 = snap.get("ai_mom_60d")
     temp = snap.get("temperature")
+    p_stress = snap.get("p_stress")
+
     if dd is None or m20 is None or m60 is None:
         return "unknown", "insufficient market history"
     if dd <= -0.30 and m20 > 0:
         return "capitulation_recovery", f"drawdown {dd:.0%} with 20d momentum turning up"
     if dd <= -0.25:
-        return "contraction", f"AI complex in deep drawdown ({dd:.0%})"
+        stress_detail = f" (HMM stress {p_stress:.0%})" if p_stress is not None else ""
+        return "contraction", f"AI complex in deep drawdown ({dd:.0%}){stress_detail}"
     if m20 < 0 and dd > -0.25:
-        return "distribution", "short-term momentum rolled over while still above deep-bear zone"
+        stress_detail = f" (HMM stress {p_stress:.0%})" if p_stress is not None else ""
+        return "distribution", f"short-term momentum rolled over while above deep-bear zone{stress_detail}"
+    if p_stress is not None and p_stress >= 0.75 and m60 < 0.05:
+        return "distribution", f"statistical HMM volatility turbulence ({p_stress:.0%}) with softening momentum"
     if temp is not None and temp >= 70 and m60 > 0:
         return "euphoria", f"temperature {temp:.0f} with intact 60d trend"
     if m60 > 0:
@@ -188,7 +211,8 @@ def capex_features(capex: pd.DataFrame | None) -> dict:
 SNAP_COLS = ["ai_mom_20d", "ai_mom_60d", "ai_drawdown_250d", "rs_ai_spx_60d",
              "rs_ai_rsp_60d", "rs_spy_rsp_60d", "power_mom_60d", "btc_mom_30d",
              "hy_oas", "hy_oas_chg_5d", "vix_cls", "vix_chg_5d", "rate_10y_proxy",
-             "temperature", "temp_confidence"]
+             "ai_breadth_20d", "ai_dispersion_20d", "real_yield_10y", "yield_curve_10y2y",
+             "vix_contango", "temperature", "temp_confidence"]
 
 
 def _today_utc() -> pd.Timestamp:

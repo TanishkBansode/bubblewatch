@@ -204,6 +204,69 @@
   </div>
 </div>
 
+<!-- Advanced Quantitative & Singularity Models -->
+<div class="card" style="margin-top:16px;">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+    <div>
+      <h2 style="margin:0;">Quantitative Analytics &amp; Singularity Signals</h2>
+      <p class="dim" style="font-size:12px; margin-top:2px;">Hidden Markov statistical regimes, LPPLS bubble timing, and multi-horizon forecasts</p>
+    </div>
+    <span class="chip" style="font-size:11px; font-family:var(--font-mono);" id="modelEngineVer">ENGINE v2</span>
+  </div>
+
+  <div class="grid" style="margin-top:12px;">
+    <!-- HMM Statistical Regime -->
+    <div style="background:#090d14; border:1px solid var(--line); border-radius:8px; padding:12px;">
+      <div style="font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:0.04em;">HMM Statistical Regime</div>
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:4px;">
+        <span class="mono" style="font-size:18px; font-weight:700;" id="hmmStressVal">–</span>
+        <span class="chip" id="hmmBadge" style="font-size:11px;">–</span>
+      </div>
+      <div class="dim" style="font-size:11px; margin-top:6px; line-height:1.35;" id="hmmDetail">Gaussian 2-state HMM on log-returns &amp; rolling 20d volatility</div>
+    </div>
+
+    <!-- LPPLS Crash Hazard -->
+    <div style="background:#090d14; border:1px solid var(--line); border-radius:8px; padding:12px;">
+      <div style="font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:0.04em;">LPPLS Bubble Singularity</div>
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:4px;">
+        <span class="mono" style="font-size:18px; font-weight:700;" id="lpplsConfVal">–</span>
+        <span class="chip" id="lpplsBadge" style="font-size:11px;">–</span>
+      </div>
+      <div class="dim" style="font-size:11px; margin-top:6px; line-height:1.35;" id="lpplsDetail">Super-exponential acceleration &amp; log-periodic oscillations (tc hazard)</div>
+    </div>
+
+    <!-- Multi-Horizon Direction & Tail Risk -->
+    <div style="background:#090d14; border:1px solid var(--line); border-radius:8px; padding:12px;">
+      <div style="font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:0.04em;">Multi-Horizon Forecasts</div>
+      <div style="display:flex; gap:12px; align-items:baseline; margin-top:4px;">
+        <div>
+          <span class="dim" style="font-size:10px;">5d Up</span>
+          <div class="mono" style="font-size:16px; font-weight:700;" id="pred5d">–</div>
+        </div>
+        <div>
+          <span class="dim" style="font-size:10px;">21d Up</span>
+          <div class="mono" style="font-size:16px; font-weight:700;" id="pred21d">–</div>
+        </div>
+        <div>
+          <span class="dim" style="font-size:10px;">21d Tail (&le;-5%)</span>
+          <div class="mono" style="font-size:16px; font-weight:700; color:var(--cold);" id="predTail21d">–</div>
+        </div>
+      </div>
+      <div class="dim" style="font-size:11px; margin-top:6px; line-height:1.35;">Purged &amp; base-rate calibrated probabilistic classifier</div>
+    </div>
+
+    <!-- Breadth & Dispersion -->
+    <div style="background:#090d14; border:1px solid var(--line); border-radius:8px; padding:12px;">
+      <div style="font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:0.04em;">AI Complex Breadth</div>
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:4px;">
+        <span class="mono" style="font-size:18px; font-weight:700;" id="breadthVal">–</span>
+        <span class="dim mono" style="font-size:11px;" id="dispersionVal">–</span>
+      </div>
+      <div class="dim" style="font-size:11px; margin-top:6px; line-height:1.35;">% of AI basket rising over 20d &amp; cross-sectional return dispersion</div>
+    </div>
+  </div>
+</div>
+
 <div id="alerts"></div>
 
 <!-- 4 Interactive Charts -->
@@ -433,6 +496,62 @@ if(S.nvda_rev_yoy_pct != null){
 } else {
   document.getElementById("nvda").textContent = "Pending seed";
   document.getElementById("capexline").textContent = "data/manual/hyperscaler_capex.csv";
+}
+
+// Quantitative Analytics & Singularity Signals Population
+if(S.p_stress != null){
+  const pStr = Math.round(S.p_stress * 100);
+  document.getElementById("hmmStressVal").textContent = pStr + "% Stress";
+  const hBadge = document.getElementById("hmmBadge");
+  if(pStr >= 75){
+    hBadge.textContent = "TURBULENT";
+    hBadge.className = "chip hot";
+  } else if(pStr <= 25){
+    hBadge.textContent = "EXPANSION";
+    hBadge.className = "chip ok";
+  } else {
+    hBadge.textContent = "NEUTRAL";
+    hBadge.className = "chip";
+  }
+  const pers = S.hmm_persistence != null ? " · Persistence " + Math.round(S.hmm_persistence * 100) + "%" : "";
+  document.getElementById("hmmDetail").textContent = "P(Turbulence) = " + pStr + "%" + pers + " · 2-state Gaussian HMM";
+} else {
+  document.getElementById("hmmStressVal").textContent = "Calibrating";
+}
+
+if(S.lppls_confidence != null){
+  const conf = Math.round(S.lppls_confidence * 100);
+  document.getElementById("lpplsConfVal").textContent = conf + "% Singularity";
+  const lBadge = document.getElementById("lpplsBadge");
+  const haz = (S.lppls_hazard_level || "NONE").toUpperCase();
+  lBadge.textContent = haz;
+  if(haz === "CRITICAL" || haz === "ELEVATED") lBadge.className = "chip hot";
+  else if(haz === "LOW") lBadge.className = "chip warn";
+  else lBadge.className = "chip cold";
+
+  const tcText = S.lppls_median_tc_days != null ? " · Singularity ~" + S.lppls_median_tc_days + "d" : "";
+  document.getElementById("lpplsDetail").textContent = "LPPLS confidence " + conf + "%" + tcText;
+} else {
+  document.getElementById("lpplsConfVal").textContent = "0% Low";
+}
+
+// Multi-horizon predictions
+if(D.preds && Array.isArray(D.preds)){
+  const p5 = D.preds.find(p => p.target === "AI_complex_dir_5d");
+  const p21 = D.preds.find(p => p.target === "AI_complex_dir_21d");
+  const ptail = D.preds.find(p => p.target === "AI_complex_tail_21d");
+
+  if(p5 && p5.p_model != null) document.getElementById("pred5d").textContent = Math.round(p5.p_model * 100) + "%";
+  if(p21 && p21.p_model != null) document.getElementById("pred21d").textContent = Math.round(p21.p_model * 100) + "%";
+  if(ptail && ptail.p_model != null) document.getElementById("predTail21d").textContent = Math.round(ptail.p_model * 100) + "%";
+}
+
+// Breadth & Dispersion
+if(S.ai_breadth_20d != null){
+  document.getElementById("breadthVal").textContent = Math.round(S.ai_breadth_20d * 100) + "% Advancing";
+}
+if(S.ai_dispersion_20d != null){
+  document.getElementById("dispersionVal").textContent = "Disp: " + fmt(S.ai_dispersion_20d * 100, 1) + "%";
 }
 
 // Alerts

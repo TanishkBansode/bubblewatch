@@ -143,6 +143,35 @@ def build(state: dict | None = None) -> Path:
     capex = storage.read_table("capex_quarterly")
 
     snap, alerts = features.current_snapshot()
+
+    if market is not None and not market.empty:
+        closes = features.market_closes(market)
+        rets = closes[[c for c in config.AI_COMPLEX if c in closes.columns]].mean(axis=1).pct_change().dropna()
+        idx = features.basket_index(closes.pct_change(), config.AI_COMPLEX).dropna()
+
+        if "p_stress" not in snap:
+            try:
+                from . import regime as regime_module
+                h = regime_module.detect_ai_regime(rets)
+                if h.get("status") == "ok":
+                    snap["p_stress"] = h.get("p_stress")
+                    snap["p_expansion"] = h.get("p_expansion")
+                    snap["hmm_regime"] = h.get("regime_state")
+                    snap["hmm_persistence"] = h.get("persistence")
+            except Exception:
+                pass
+
+        if "lppls_confidence" not in snap:
+            try:
+                from . import lppls_model
+                lp = lppls_model.compute_lppls_hazard(idx)
+                if lp.get("status") == "ok":
+                    snap["lppls_confidence"] = lp.get("confidence")
+                    snap["lppls_hazard_level"] = lp.get("hazard_level")
+                    snap["lppls_median_tc_days"] = lp.get("median_days_to_tc")
+            except Exception:
+                pass
+
     regime = features.classify_regime(snap)
     proxy = (state or {}).get("proxy") or models.train_direction_model()
     preds = (state or {}).get("preds") or models.direction_predictions(proxy)

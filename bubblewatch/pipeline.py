@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 import pandas as pd
 
-from . import config, features, models, report, storage
+from . import config, features, lppls_model, models, regime as regime_module, report, storage
 from .ingest import capex, equities, fred
 
 
@@ -42,6 +42,40 @@ def run(report_only: bool = False) -> None:
                 traceback.print_exc()
 
     snap, alerts = features.current_snapshot()
+    market = storage.read_table("market_prices")
+
+    # Quantitative upgrades: HMM statistical regime detection & LPPLS bubble singularity
+    if market is not None and not market.empty:
+        closes = features.market_closes(market)
+        rets = closes[[c for c in config.AI_COMPLEX if c in closes.columns]].mean(axis=1).pct_change().dropna()
+        idx = features.basket_index(closes.pct_change(), config.AI_COMPLEX).dropna()
+
+        # 1. HMM Statistical Regime Detection
+        try:
+            hmm_res = regime_module.detect_ai_regime(rets)
+            if hmm_res.get("status") == "ok":
+                snap["p_stress"] = hmm_res.get("p_stress")
+                snap["p_expansion"] = hmm_res.get("p_expansion")
+                snap["hmm_regime"] = hmm_res.get("regime_state")
+                snap["hmm_persistence"] = hmm_res.get("persistence")
+                if hmm_res.get("p_stress", 0) >= 0.80:
+                    alerts.append(f"HMM statistical regime detects elevated volatility turbulence (P_stress = {hmm_res['p_stress']:.0%})")
+        except Exception as exc:  # noqa: BLE001
+            storage.log_run("hmm_regime", "error", detail=str(exc))
+
+        # 2. LPPLS Crash Hazard Detection
+        try:
+            lppls_res = lppls_model.compute_lppls_hazard(idx)
+            if lppls_res.get("status") == "ok":
+                snap["lppls_confidence"] = lppls_res.get("confidence")
+                snap["lppls_hazard_level"] = lppls_res.get("hazard_level")
+                snap["lppls_median_tc_days"] = lppls_res.get("median_days_to_tc")
+                if lppls_res.get("confidence", 0) >= 0.30:
+                    tc_days = lppls_res.get("median_days_to_tc")
+                    alerts.append(f"LPPLS bubble singularity detected ({lppls_res['confidence']:.0%} confidence; critical horizon ~{tc_days}d)")
+        except Exception as exc:  # noqa: BLE001
+            storage.log_run("lppls", "error", detail=str(exc))
+
     regime = features.classify_regime(snap)
     proxy = models.train_direction_model()
     preds = models.direction_predictions(proxy)

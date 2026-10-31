@@ -7,9 +7,10 @@ MANUAL_DIR = DATA_DIR / "manual"
 LOGS_DIR = BASE_DIR / "logs"
 LEDGER_PATH = DATA_DIR / "predictions.jsonl"
 
-# v1: trading-day calendar (no BTC weekend rows), proximity-to-highs sign fix,
-# live-feature predictions, NaN-safe targets, trading-day ledger scoring.
-MODEL_VERSION = "v1"
+# v2: quantitative upgrades: purged/embargoed CV, HMM statistical regimes,
+# base-rate calibrated probability forecasts, multi-horizon risk, LPPLS crash hazard,
+# AI breadth/dispersion, real rates (DFII10) and yield curve (T10Y2Y).
+MODEL_VERSION = "v2"
 
 RUN_DATE_FMT = "%Y-%m-%d"
 
@@ -20,7 +21,7 @@ TICKER_BUCKETS = {
         "VRT", "ETN", "PWR", "DLR", "EQIX", "MU",
     ],
     "power_theme": ["CEG", "VST", "NEE", "TLN"],
-    "benchmarks": ["SPY", "RSP", "QQQ", "^SOX", "^VIX", "^TNX", "BTC-USD"],
+    "benchmarks": ["SPY", "RSP", "QQQ", "^SOX", "^VIX", "^TNX", "BTC-USD", "VX=F"],
 }
 ALL_TICKERS = [t for ts in TICKER_BUCKETS.values() for t in ts]
 AI_COMPLEX = TICKER_BUCKETS["ai_complex"]
@@ -29,6 +30,8 @@ POWER_THEME = TICKER_BUCKETS["power_theme"]
 FRED_SERIES = {
     "hy_oas": "BAMLH0A0HYM2",
     "vix_cls": "VIXCLS",
+    "real_yield_10y": "DFII10",
+    "yield_curve_10y2y": "T10Y2Y",
 }
 FRED_START = "2024-01-01"
 FRED_TIMEOUT_S = 45
