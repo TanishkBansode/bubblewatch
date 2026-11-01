@@ -1,4 +1,4 @@
-# BubbleWatch Daily Digest — 2026-10-31 06:45 UTC
+# BubbleWatch Daily Digest — 2026-11-01 07:16 UTC
 
 ## Verdict
 - **Bubble temperature:** **22/100** (frost) — gauge coverage 100%
@@ -9,8 +9,8 @@
 | Indicator | Value |
 |---|---|
 | Market data as-of | 2026-10-30 |
-| Bubble temperature (0-100) | 21.90 |
-| Temperature change vs 1wk ago (pts) | -14.40 |
+| Bubble temperature (0-100) | 21.70 |
+| Temperature change vs 1wk ago (pts) | -14.60 |
 | Gauge coverage | 1.00 |
 | AI complex momentum 20d | -0.11 |
 | AI complex momentum 60d | -0.02 |
@@ -21,7 +21,7 @@
 | AI complex vs equal-weight S&P 60d | -0.01 |
 | Cap-vs-equal-weight spread 60d (concentration) | -0.02 |
 | Power/utilities theme momentum 60d | 0.00 |
-| BTC momentum 30d (risk appetite) | -0.03 |
+| BTC momentum 30d (risk appetite) | -0.05 |
 | US HY credit spread OAS (%) | 3.26 |
 | HY spread change 5d (pts) | -0.12 |
 | Credit spread data as-of | 2026-10-29 |
@@ -37,13 +37,13 @@
 | NVDA revenue YoY (%) | 106.00 |
 | NVDA YoY deceleration QoQ (pts) | 21.00 |
 | Fundamentals anchor quarter | 2026Q2 |
-| Days since fundamentals quarter-end | 123 |
+| Days since fundamentals quarter-end | 124 |
 
 ## Today's predictions (logged to ledger)
 | Target | Horizon | Model P(up) | Constant baseline | Note |
 |---|---|---|---|---|
 | AI_complex_dir_5d | 5d | 0.65 | 0.50 | regularized logistic on equity+credit+breadth; purged train/test |
-| AI_complex_dir_21d | 21d | 0.79 | 0.50 | 21-trading-day direction forecast (~1 month) |
+| AI_complex_dir_21d | 21d | 0.78 | 0.50 | 21-trading-day direction forecast (~1 month) |
 | AI_complex_tail_21d | 21d | 0.09 | 0.15 | 21-trading-day tail risk hazard: P(return <= -5%) |
 
 ## Alerts
@@ -53,8 +53,8 @@
 ## Source status (this run)
 | Source | Status | Rows | Detail |
 |---|---|---|---|
-| equities | ok | 24721 | total=26359 new_days=1 src=yfinance |
-| fred | ok | 1439 | total=2888 latest={'hy_oas': '2026-10-29', 'real_yield_10y': '2026-10-29', 'vix_ |
+| equities | ok | 23222 | total=26360 new_days=1 src=yfinance |
+| fred | ok_stale | 0 | no fresh pulls succeeded |
 | capex | ok | 10 | total=10 latest_period=2026Q2 |
 
 ## Prediction scoreboard (vs baselines)
