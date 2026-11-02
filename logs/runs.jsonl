@@ -324,3 +324,6 @@
 {"ts": "2026-11-01T07:16:07+00:00", "source": "fred", "status": "error", "rows": 0, "detail": "T10Y2Y: The read operation timed out"}
 {"ts": "2026-11-01T07:16:07+00:00", "source": "fred", "status": "ok_stale", "rows": 0, "detail": "no fresh pulls succeeded"}
 {"ts": "2026-11-01T07:16:07+00:00", "source": "capex", "status": "ok", "rows": 10, "detail": "total=10 latest_period=2026Q2"}
+{"ts": "2026-11-02T07:27:08+00:00", "source": "equities", "status": "ok", "rows": 24722, "detail": "total=26361 new_days=1 src=yfinance"}
+{"ts": "2026-11-02T07:27:09+00:00", "source": "fred", "status": "ok", "rows": 44, "detail": "total=2888 latest={'hy_oas': '2026-10-29', 'real_yield_10y': '2026-10-29', 'vix_cls': '2026-10-29', 'yield_curve_10y2y': '2026-10-30'}"}
+{"ts": "2026-11-02T07:27:09+00:00", "source": "capex", "status": "ok", "rows": 10, "detail": "total=10 latest_period=2026Q2"}
