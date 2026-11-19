@@ -25,6 +25,7 @@ FEATURE_LABELS = [
     ("hy_oas_chg_5d", "HY spread change 5d (pts)"),
     ("hy_oas_asof", "Credit spread data as-of"),
     ("vix_cls", "VIX close"),
+    ("vix_term_proxy", "VIX vs 20d MA ratio (term proxy)"),
     ("rate_10y_proxy", "US 10Y yield proxy (%)"),
     ("real_yield_10y", "US 10Y TIPS real yield (%)"),
     ("yield_curve_10y2y", "US 10Y-2Y yield curve spread (%)"),

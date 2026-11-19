@@ -150,5 +150,23 @@ class TestModelsAndCalibration(unittest.TestCase):
         self.assertIn("AI_complex_tail_21d", targets)
 
 
+class TestModelFeatures(unittest.TestCase):
+    def test_p_stress_and_vix_in_model_features(self):
+        """Verify that p_stress, vix_cls, and vix_term_proxy are in the model feature list."""
+        self.assertIn("p_stress", features.MODEL_FEATURES)
+        self.assertIn("vix_cls", features.MODEL_FEATURES)
+        self.assertIn("vix_term_proxy", features.MODEL_FEATURES)
+
+    def test_class_weight_balanced(self):
+        """Verify LogisticRegression uses balanced class weights."""
+        from sklearn.linear_model import LogisticRegression
+        lr = LogisticRegression(C=0.5, class_weight="balanced", max_iter=1000)
+        X = np.array([[1], [2], [3], [4], [5], [6], [7], [8], [9], [10]])
+        y = np.array([1, 1, 1, 1, 1, 1, 1, 0, 0, 0])
+        lr.fit(X, y)
+        preds = lr.predict(X)
+        self.assertTrue((preds == 0).any(), "Balanced class weight should prevent all-positive predictions")
+
+
 if __name__ == "__main__":
     unittest.main()

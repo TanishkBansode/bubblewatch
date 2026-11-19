@@ -7,10 +7,10 @@ MANUAL_DIR = DATA_DIR / "manual"
 LOGS_DIR = BASE_DIR / "logs"
 LEDGER_PATH = DATA_DIR / "predictions.jsonl"
 
-# v2: quantitative upgrades: purged/embargoed CV, HMM statistical regimes,
-# base-rate calibrated probability forecasts, multi-horizon risk, LPPLS crash hazard,
-# AI breadth/dispersion, real rates (DFII10) and yield curve (T10Y2Y).
-MODEL_VERSION = "v2"
+# v3: quantitative upgrades: balanced class weights, HMM regime p_stress feature injection,
+# VIX term structure proxy, adjusted C=0.5 regularization, purged/embargoed CV,
+# multi-horizon forecasts, LPPLS singularity hazard, breadth/dispersion.
+MODEL_VERSION = "v3"
 
 RUN_DATE_FMT = "%Y-%m-%d"
 
@@ -21,7 +21,7 @@ TICKER_BUCKETS = {
         "VRT", "ETN", "PWR", "DLR", "EQIX", "MU",
     ],
     "power_theme": ["CEG", "VST", "NEE", "TLN"],
-    "benchmarks": ["SPY", "RSP", "QQQ", "^SOX", "^VIX", "^TNX", "BTC-USD", "VX=F"],
+    "benchmarks": ["SPY", "RSP", "QQQ", "^SOX", "^VIX", "^TNX", "BTC-USD"],
 }
 ALL_TICKERS = [t for ts in TICKER_BUCKETS.values() for t in ts]
 AI_COMPLEX = TICKER_BUCKETS["ai_complex"]

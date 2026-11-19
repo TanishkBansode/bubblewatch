@@ -10,6 +10,9 @@ MODEL_FEATURES = [
     "rs_ai_spx_60d", "rs_ai_rsp_60d", "rs_spy_rsp_60d",
     "power_mom_60d", "btc_mom_30d", "hy_oas_chg_5d", "vix_chg_5d",
     "ai_breadth_20d", "ai_dispersion_20d",
+    "p_stress",
+    "vix_cls",
+    "vix_term_proxy",
 ]
 
 
@@ -93,10 +96,14 @@ def build_feature_frame(market: pd.DataFrame, fred: pd.DataFrame | None) -> pd.D
     if vix.notna().any():
         feats["vix_cls"] = vix
         feats["vix_chg_5d"] = vix.diff(5)
-    if "VX=F" in closes.columns and "^VIX" in closes.columns:
-        vx = closes["VX=F"].dropna()
-        if not vx.empty:
-            feats["vix_contango"] = (closes["VX=F"] / closes["^VIX"] - 1.0)
+    # VIX term structure proxy: VIX relative to its own 20d moving average.
+    # Positive = VIX elevated vs recent norm (backwardation-like, stressed).
+    # Negative = VIX suppressed vs recent norm (contango-like, complacent).
+    if "^VIX" in closes.columns:
+        _vix_raw = closes["^VIX"].dropna()
+        if len(_vix_raw) >= 20:
+            _vix_ma20 = _vix_raw.rolling(20, min_periods=10).mean()
+            feats["vix_term_proxy"] = (_vix_raw / _vix_ma20 - 1.0).reindex(feats.index)
     if "^TNX" in closes.columns:
         raw = closes["^TNX"].dropna()
         if not raw.empty:
@@ -212,7 +219,7 @@ SNAP_COLS = ["ai_mom_20d", "ai_mom_60d", "ai_drawdown_250d", "rs_ai_spx_60d",
              "rs_ai_rsp_60d", "rs_spy_rsp_60d", "power_mom_60d", "btc_mom_30d",
              "hy_oas", "hy_oas_chg_5d", "vix_cls", "vix_chg_5d", "rate_10y_proxy",
              "ai_breadth_20d", "ai_dispersion_20d", "real_yield_10y", "yield_curve_10y2y",
-             "vix_contango", "temperature", "temp_confidence"]
+             "vix_term_proxy", "temperature", "temp_confidence"]
 
 
 def _today_utc() -> pd.Timestamp:

@@ -44,6 +44,9 @@ def run(report_only: bool = False) -> None:
     snap, alerts = features.current_snapshot()
     market = storage.read_table("market_prices")
 
+    # Time series of HMM stress probability for injection into model feature frame
+    hmm_p_stress_series = None
+
     # Quantitative upgrades: HMM statistical regime detection & LPPLS bubble singularity
     if market is not None and not market.empty:
         closes = features.market_closes(market)
@@ -52,7 +55,12 @@ def run(report_only: bool = False) -> None:
 
         # 1. HMM Statistical Regime Detection
         try:
-            hmm_res = regime_module.detect_ai_regime(rets)
+            detector = regime_module.HMMRegimeDetector(n_components=2, n_iter=100, random_state=42)
+            detector.fit(rets)
+            hmm_probs = detector.predict_probabilities(rets)
+            hmm_p_stress_series = hmm_probs["p_stress"]
+
+            hmm_res = detector.latest_state(rets)
             if hmm_res.get("status") == "ok":
                 snap["p_stress"] = hmm_res.get("p_stress")
                 snap["p_expansion"] = hmm_res.get("p_expansion")
@@ -77,7 +85,7 @@ def run(report_only: bool = False) -> None:
             storage.log_run("lppls", "error", detail=str(exc))
 
     regime = features.classify_regime(snap)
-    proxy = models.train_direction_model()
+    proxy = models.train_direction_model(hmm_p_stress_series=hmm_p_stress_series)
     preds = models.direction_predictions(proxy)
 
     try:

@@ -105,7 +105,7 @@ def _skill_label(model_brier: float, benchmark_brier: float, n: int) -> str:
     return "neutral"
 
 
-def train_direction_model() -> dict[str, Any]:
+def train_direction_model(hmm_p_stress_series: pd.Series | None = None) -> dict[str, Any]:
     market = storage.read_table("market_prices")
     fred = storage.read_table("fred_daily")
     if market is None or market.empty:
@@ -116,6 +116,21 @@ def train_direction_model() -> dict[str, Any]:
     feats = feats.dropna(subset=["ai_mom_60d"])
     if feats.empty:
         return {"status": "no_data"}
+
+    # Inject HMM p_stress time series into feature frame so the model can use it
+    if hmm_p_stress_series is None:
+        try:
+            from . import regime as regime_module
+            rets_ai = closes[[c for c in config.AI_COMPLEX if c in closes.columns]].mean(axis=1).pct_change().dropna()
+            detector = regime_module.HMMRegimeDetector(n_components=2, n_iter=100, random_state=42)
+            detector.fit(rets_ai)
+            hmm_probs = detector.predict_probabilities(rets_ai)
+            hmm_p_stress_series = hmm_probs["p_stress"]
+        except Exception:
+            hmm_p_stress_series = None
+
+    if hmm_p_stress_series is not None:
+        feats["p_stress"] = hmm_p_stress_series.reindex(feats.index).ffill(limit=5)
 
     # Use available features with stable fallback
     x_cols = [c for c in MODEL_FEATURES if c in feats.columns]
@@ -134,8 +149,8 @@ def train_direction_model() -> dict[str, Any]:
     X_test = data[x_cols].iloc[split:]
     y_test = data["target"].iloc[split:]
 
-    # Regularized L2 pipeline with feature standard scaling
-    model = make_pipeline(StandardScaler(), LogisticRegression(C=0.15, max_iter=1000))
+    # Regularized L2 pipeline with feature standard scaling & balanced class weights
+    model = make_pipeline(StandardScaler(), LogisticRegression(C=0.5, class_weight="balanced", max_iter=1000))
     model.fit(X_train, y_train)
 
     train_base_rate = float(y_train.mean())
@@ -177,7 +192,7 @@ def train_direction_model() -> dict[str, Any]:
         )
 
     # Refit full historical sample for current live prediction
-    full_model = make_pipeline(StandardScaler(), LogisticRegression(C=0.15, max_iter=1000))
+    full_model = make_pipeline(StandardScaler(), LogisticRegression(C=0.5, class_weight="balanced", max_iter=1000))
     full_model.fit(data[x_cols], data["target"])
 
     latest = feats[x_cols].iloc[[-1]].copy()
@@ -191,14 +206,14 @@ def train_direction_model() -> dict[str, Any]:
     # Train 21-day directional model
     data_21d = make_supervised(feats, idx, horizon_days=21, x_cols=x_cols)
     if len(data_21d) >= 120:
-        m21 = make_pipeline(StandardScaler(), LogisticRegression(C=0.15, max_iter=1000))
+        m21 = make_pipeline(StandardScaler(), LogisticRegression(C=0.5, class_weight="balanced", max_iter=1000))
         m21.fit(data_21d[x_cols], data_21d["target"])
         result["p_ai_up_21d"] = round(float(m21.predict_proba(latest)[0, 1]), 3)
 
     # Train 21-day tail risk model (drawdown <= -5%)
     data_tail21 = make_supervised(feats, idx, horizon_days=21, x_cols=x_cols, is_tail_risk=True, tail_threshold=-0.05)
     if len(data_tail21) >= 120:
-        mtail21 = make_pipeline(StandardScaler(), LogisticRegression(C=0.15, max_iter=1000))
+        mtail21 = make_pipeline(StandardScaler(), LogisticRegression(C=0.5, max_iter=1000))
         mtail21.fit(data_tail21[x_cols], data_tail21["target"])
         result["p_tail_down_5pct_21d"] = round(float(mtail21.predict_proba(latest)[0, 1]), 3)
 
