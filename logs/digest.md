@@ -1,9 +1,9 @@
-# BubbleWatch Daily Digest — 2026-11-19 08:29 UTC
+# BubbleWatch Daily Digest — 2026-11-19 15:42 UTC
 
 ## Verdict
 - **Bubble temperature:** **12/100** (frost) — gauge coverage 100%
 - **Regime:** `distribution` — short-term momentum rolled over while above deep-bear zone (HMM stress 100%)
-- **Model** P(AI complex up next 5d): **67%** (test Brier 0.2519 vs majority acc 0.547, asof 2026-11-18)
+- **Model** P(AI complex up next 5d): **51%** (test Brier 0.2803 vs majority acc 0.547, asof 2026-11-18)
 
 ## Key indicators
 | Indicator | Value |
@@ -26,6 +26,7 @@
 | HY spread change 5d (pts) | 0.13 |
 | Credit spread data as-of | 2026-11-17 |
 | VIX close | 24.56 |
+| VIX vs 20d MA ratio (term proxy) | 0.20 |
 | US 10Y yield proxy (%) | 5.07 |
 | US 10Y TIPS real yield (%) | 2.89 |
 | US 10Y-2Y yield curve spread (%) | 0.27 |
@@ -42,9 +43,9 @@
 ## Today's predictions (logged to ledger)
 | Target | Horizon | Model P(up) | Constant baseline | Note |
 |---|---|---|---|---|
-| AI_complex_dir_5d | 5d | 0.67 | 0.50 | regularized logistic on equity+credit+breadth; purged train/test |
-| AI_complex_dir_21d | 21d | 0.67 | 0.50 | 21-trading-day direction forecast (~1 month) |
-| AI_complex_tail_21d | 21d | 0.18 | 0.15 | 21-trading-day tail risk hazard: P(return <= -5%) |
+| AI_complex_dir_5d | 5d | 0.51 | 0.50 | regularized logistic on equity+credit+breadth; purged train/test |
+| AI_complex_dir_21d | 21d | 0.40 | 0.50 | 21-trading-day direction forecast (~1 month) |
+| AI_complex_tail_21d | 21d | 0.28 | 0.15 | 21-trading-day tail risk hazard: P(return <= -5%) |
 
 ## Alerts
 - ⚠️ Ice zone (12/100): extreme pessimism often marks late-stage selloffs
@@ -61,8 +62,8 @@
 ## Prediction scoreboard (vs baselines)
 | target            | model      |   n |   brier |   accuracy |
 |:------------------|:-----------|----:|--------:|-----------:|
-| AI_complex_dir_5d | p_model    |  90 |  0.2945 |      0.278 |
-| AI_complex_dir_5d | p_constant |  90 |  0.25   |      0.544 |
+| AI_complex_dir_5d | p_model    |  88 |  0.2925 |      0.284 |
+| AI_complex_dir_5d | p_constant |  88 |  0.25   |      0.534 |
 
 ---
 *Temperature = weighted z-composite; formula and weights published on the site. Baselines are permanent. Not investment advice.*
