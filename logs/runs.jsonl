@@ -384,3 +384,6 @@
 {"ts": "2026-11-21T08:04:57+00:00", "source": "equities", "status": "ok", "rows": 24724, "detail": "total=26860 new_days=1 src=yfinance"}
 {"ts": "2026-11-21T08:04:58+00:00", "source": "fred", "status": "ok", "rows": 46, "detail": "total=2946 latest={'hy_oas': '2026-11-19', 'real_yield_10y': '2026-11-19', 'vix_cls': '2026-11-19', 'yield_curve_10y2y': '2026-11-20'}"}
 {"ts": "2026-11-21T08:04:58+00:00", "source": "capex", "status": "ok", "rows": 10, "detail": "total=10 latest_period=2026Q2"}
+{"ts": "2026-11-22T07:51:24+00:00", "source": "equities", "status": "ok", "rows": 24724, "detail": "total=26861 new_days=1 src=yfinance"}
+{"ts": "2026-11-22T07:51:25+00:00", "source": "fred", "status": "ok", "rows": 42, "detail": "total=2946 latest={'hy_oas': '2026-11-19', 'real_yield_10y': '2026-11-19', 'vix_cls': '2026-11-19', 'yield_curve_10y2y': '2026-11-20'}"}
+{"ts": "2026-11-22T07:51:25+00:00", "source": "capex", "status": "ok", "rows": 10, "detail": "total=10 latest_period=2026Q2"}
