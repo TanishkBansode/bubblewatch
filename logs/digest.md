@@ -1,4 +1,4 @@
-# BubbleWatch Daily Digest — 2026-11-26 09:14 UTC
+# BubbleWatch Daily Digest — 2026-11-27 09:30 UTC
 
 ## Verdict
 - **Bubble temperature:** **4/100** (frost) — gauge coverage 100%
@@ -38,7 +38,7 @@
 | NVDA revenue YoY (%) | 106.00 |
 | NVDA YoY deceleration QoQ (pts) | 21.00 |
 | Fundamentals anchor quarter | 2026Q2 |
-| Days since fundamentals quarter-end | 149 |
+| Days since fundamentals quarter-end | 150 |
 
 ## Today's predictions (logged to ledger)
 | Target | Horizon | Model P(up) | Constant baseline | Note |
@@ -49,14 +49,14 @@
 
 ## Alerts
 - ⚠️ Ice zone (4/100): extreme pessimism often marks late-stage selloffs
-- ⚠️ Fundamentals anchor stale (latest quarter 2026Q2, 149d old) — append new quarters to data/manual/hyperscaler_capex.csv
+- ⚠️ Fundamentals anchor stale (latest quarter 2026Q2, 150d old) — append new quarters to data/manual/hyperscaler_capex.csv
 - ⚠️ HMM statistical regime detects elevated volatility turbulence (P_stress = 100%)
 
 ## Source status (this run)
 | Source | Status | Rows | Detail |
 |---|---|---|---|
-| equities | ok | 24724 | total=26962 new_days=1 src=yfinance |
-| fred | ok | 46 | total=2958 latest={'hy_oas': '2026-11-24', 'real_yield_10y': '2026-11-24', 'vix_ |
+| equities | ok | 24724 | total=26964 new_days=1 src=yfinance |
+| fred | ok | 42 | total=2958 latest={'hy_oas': '2026-11-24', 'real_yield_10y': '2026-11-24', 'vix_ |
 | capex | ok | 10 | total=10 latest_period=2026Q2 |
 
 ## Prediction scoreboard (vs baselines)
